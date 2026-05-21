@@ -1,0 +1,50 @@
+from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QLineEdit
+from PyQt5.QtCore import Qt
+from pyautogui import size
+
+def run():
+    app = QApplication([])
+    window = MainWindow()
+    app.exec_()
+
+WIDTH, HEIGHT = size()
+TITLE = "Pomodoro Temporizer"
+WINDOW_COLOR = (255, 218, 209)
+TEXT_COLOR = (255, 255, 255)
+FONT = "Times New Roman"
+FONT_SIZE = 32
+
+class MainWindow(QWidget):
+    def __init__(self, parent=None, flags=Qt.WindowFlags()):
+        super().__init__(parent=parent, flags=flags)
+
+        self.config_window()
+        self.set_mainscreen()
+        self.event_handler()
+        self.show()
+
+    def config_window(self):
+        self.setWindowTitle(TITLE)
+        self.setGeometry(0, 0, WIDTH, HEIGHT)
+        self.setStyleSheet(f"background-color: rgb{WINDOW_COLOR}; color: rgb{TEXT_COLOR}; font-size: {FONT_SIZE}px; font-family: {FONT};")
+
+    def set_mainscreen(self):
+        ## ESTABLECER DISENO DE LA VENTANA
+        self.label = QLabel(f"Welcome to {TITLE}!")
+        self.button = QPushButton("Start temporizer")
+
+        self.main_Layout = QVBoxLayout()
+        self.main_Layout.addWidget(self.label, alignment=Qt.AlignCenter)
+        self.main_Layout.addWidget(self.button, alignment=Qt.AlignCenter)
+        
+        self.setLayout(self.main_Layout)
+
+    def start_temporizer(self):
+        self.label.setText("Temporizer started")
+        self.button.hide()
+
+    def event_handler(self):
+        self.button.clicked.connect(self.start_temporizer)
+
+
+run()
