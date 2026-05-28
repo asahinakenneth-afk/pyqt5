@@ -18,7 +18,6 @@ FONT = "Consolas"
 FONT_SIZE = 32
 SET_STYLE = f"color: rgb{TEXT_COLOR}; font-size: {FONT_SIZE}px; font-family: {FONT};"
 
-
 class MainWindow(QWidget):
     def __init__(self, parent=None, flags=Qt.WindowFlags()):
         super().__init__(parent=parent, flags=flags)
@@ -31,7 +30,34 @@ class MainWindow(QWidget):
     def config_window(self):
         self.setWindowTitle(TITLE)
         self.setGeometry(0, 0, WIDTH, HEIGHT)
-        self.setStyleSheet(f"background-color: rgb{WINDOW_COLOR}; {SET_STYLE}")
+        self.setStyleSheet(f"background-color: rgb({WINDOW_COLOR}); {SET_STYLE}")
+
+    # def setup_styles(self):
+    # # Write it like standard CSS, targeting your screen class names
+    #     global_stylesheet = f"""
+    #         MainWindow {{
+    #             /* Default background */
+    #             background-color: {REST_COLOR}; 
+    #         }}
+            
+    #         QLabel {{
+    #             color: {TEXT_COLOR};
+    #             font-size: 16px;
+    #         }}
+            
+    #         QPushButton {{
+    #             color: {TEXT_COLOR};
+    #             background-color: #333333; /* Example button color */
+    #             border-radius: 15px;
+    #             padding: 8px 15px;
+    #             font-size: 14px;
+    #         }}
+            
+    #         QPushButton:hover {{
+    #             background-color: #444444; /* Quick bonus hover effect */
+    #         }}
+    #     """
+    #     self.setStyleSheet(global_stylesheet)
 
     def set_mainscreen(self):
         ## ESTABLECER DISENO DE LA VENTANA
@@ -48,15 +74,13 @@ class MainWindow(QWidget):
 
         self.stop_button.hide()
         self.timer.hide()
-        
-        self.time_left = QTime(0, 0, 20) ## 25 minutitos
+
         self.timer_engine = QTimer(self) ## Cuenta el tiempo, valga la redundancia
         self.timer_engine.timeout.connect(self.update_timer) ## La conecta a la funcion que actualiza el tiempo
 
         self.setLayout(self.main_Layout)
     
     def pomodoro_screen(self):
-        self.setStyleSheet(f"background-color: rgb{TEMPORIZER_COLOR}; {SET_STYLE}")
         self.label.setText("Temporizer started")
 
         self.start_button.hide()
@@ -65,7 +89,8 @@ class MainWindow(QWidget):
         self.stop_button.show()
 
     def rest_screen(self):
-        self.setStyleSheet(f"background-color: rgb{REST_COLOR}; {SET_STYLE}")
+        self.label.setText("Its rest time!")
+        self.stop_button.hide()
         self.rest_temporizer()
 
     def update_timer(self):
@@ -79,12 +104,15 @@ class MainWindow(QWidget):
         if self.time_left == QTime(0, 0, 0):
             self.timer_engine.stop()
 
-            self.rest_screen()
+            if self.pomodoro_screen:
+                self.rest_screen()
+            else:
+                self.start_temporizer()
 
     def start_temporizer(self):
         self.pomodoro_screen()
+        self.time_left = QTime(0, 0, 25) ## 25 minutitos
         self.timer_engine.start(1000) # que tan lento baja el contador de tiempo
-
 
     def stop_temporizer(self):
         self.label.setText("Temporizer stopped")
@@ -94,13 +122,12 @@ class MainWindow(QWidget):
         self.start_button.show()
         
     def rest_temporizer(self):
-        self.time_left = QTime(0, 5, 0) ## 5 minutitos de descanso
+        self.time_left = QTime(0, 0, 20) ## 5 minutitos de descanso
         self.timer.setText(self.time_left.toString("mm:ss"))
         self.timer_engine.start(1000)
 
     def event_handler(self):
         self.start_button.clicked.connect(self.start_temporizer)
         self.stop_button.clicked.connect(self.stop_temporizer)
-
 
 run()
