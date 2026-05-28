@@ -65,7 +65,7 @@ class MainWindow(QWidget):
         self.stop_button.show()
 
     def rest_screen(self):
-        self.setStyleSheet(f"background-color: rgb{TEMPORIZER_COLOR}; {SET_STYLE}")
+        self.setStyleSheet(f"background-color: rgb{REST_COLOR}; {SET_STYLE}")
         self.rest_temporizer()
 
     def update_timer(self):
