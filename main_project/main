@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QLineEdit
-from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
+from PyQt5.QtCore import Qt, QTimer, QTime
 from pyautogui import size
 
 def run():
@@ -9,10 +10,14 @@ def run():
 
 WIDTH, HEIGHT = size()
 TITLE = "Pomodoro Temporizer"
-WINDOW_COLOR = (255, 218, 209)
+WINDOW_COLOR = (255, 199, 222)
+TEMPORIZER_COLOR = (255, 157, 143)
 TEXT_COLOR = (255, 255, 255)
-FONT = "Times New Roman"
+REST_COLOR = (157, 205, 237)
+FONT = "Consolas"
 FONT_SIZE = 32
+SET_STYLE = f"color: rgb{TEXT_COLOR}; font-size: {FONT_SIZE}px; font-family: {FONT};"
+
 
 class MainWindow(QWidget):
     def __init__(self, parent=None, flags=Qt.WindowFlags()):
@@ -26,25 +31,76 @@ class MainWindow(QWidget):
     def config_window(self):
         self.setWindowTitle(TITLE)
         self.setGeometry(0, 0, WIDTH, HEIGHT)
-        self.setStyleSheet(f"background-color: rgb{WINDOW_COLOR}; color: rgb{TEXT_COLOR}; font-size: {FONT_SIZE}px; font-family: {FONT};")
+        self.setStyleSheet(f"background-color: rgb{WINDOW_COLOR}; {SET_STYLE}")
 
     def set_mainscreen(self):
         ## ESTABLECER DISENO DE LA VENTANA
         self.label = QLabel(f"Welcome to {TITLE}!")
-        self.button = QPushButton("Start temporizer")
+        self.timer = QLabel("25:00", self)
+        self.start_button = QPushButton("Start temporizer")
+        self.stop_button = QPushButton("Stop Temporizer")
 
         self.main_Layout = QVBoxLayout()
         self.main_Layout.addWidget(self.label, alignment=Qt.AlignCenter)
-        self.main_Layout.addWidget(self.button, alignment=Qt.AlignCenter)
+        self.main_Layout.addWidget(self.timer, alignment=Qt.AlignCenter)
+        self.main_Layout.addWidget(self.start_button, alignment=Qt.AlignCenter)
+        self.main_Layout.addWidget(self.stop_button, alignment=Qt.AlignCenter)
+
+        self.stop_button.hide()
+        self.timer.hide()
         
+        self.time_left = QTime(0, 0, 20) ## 25 minutitos
+        self.timer_engine = QTimer(self) ## Cuenta el tiempo, valga la redundancia
+        self.timer_engine.timeout.connect(self.update_timer) ## La conecta a la funcion que actualiza el tiempo
+
         self.setLayout(self.main_Layout)
+    
+    def pomodoro_screen(self):
+        self.setStyleSheet(f"background-color: rgb{TEMPORIZER_COLOR}; {SET_STYLE}")
+        self.label.setText("Temporizer started")
+
+        self.start_button.hide()
+
+        self.timer.show()
+        self.stop_button.show()
+
+    def rest_screen(self):
+        self.setStyleSheet(f"background-color: rgb{TEMPORIZER_COLOR}; {SET_STYLE}")
+        self.rest_temporizer()
+
+    def update_timer(self):
+        # Sirve para todos los contadores
+
+        ## Basicamente le resta los segundos al contador
+        self.time_left = self.time_left.addSecs(-1)
+        ## Si no pones esto no se actualiza JAJA
+        self.timer.setText(self.time_left.toString("mm:ss")) ##solo minutos y segunditos
+
+        if self.time_left == QTime(0, 0, 0):
+            self.timer_engine.stop()
+
+            self.rest_screen()
 
     def start_temporizer(self):
-        self.label.setText("Temporizer started")
-        self.button.hide()
+        self.pomodoro_screen()
+        self.timer_engine.start(1000) # que tan lento baja el contador de tiempo
+
+
+    def stop_temporizer(self):
+        self.label.setText("Temporizer stopped")
+        self.timer_engine.stop()
+
+        self.stop_button.hide()
+        self.start_button.show()
+        
+    def rest_temporizer(self):
+        self.time_left = QTime(0, 5, 0) ## 5 minutitos de descanso
+        self.timer.setText(self.time_left.toString("mm:ss"))
+        self.timer_engine.start(1000)
 
     def event_handler(self):
-        self.button.clicked.connect(self.start_temporizer)
+        self.start_button.clicked.connect(self.start_temporizer)
+        self.stop_button.clicked.connect(self.stop_temporizer)
 
 
 run()
