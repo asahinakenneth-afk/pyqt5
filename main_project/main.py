@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QVBoxLay
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt, QTimer, QTime
 from pyautogui import size
+from QSS_Stylesheet import *
 
 def run():
     app = QApplication([])
@@ -10,13 +11,6 @@ def run():
 
 WIDTH, HEIGHT = size()
 TITLE = "Pomodoro Temporizer"
-WINDOW_COLOR = (255, 199, 222)
-TEMPORIZER_COLOR = (255, 157, 143)
-TEXT_COLOR = (255, 255, 255)
-REST_COLOR = (157, 205, 237)
-FONT = "Consolas"
-FONT_SIZE = 32
-SET_STYLE = f"color: rgb{TEXT_COLOR}; font-size: {FONT_SIZE}px; font-family: {FONT};"
 
 class MainWindow(QWidget):
     def __init__(self, parent=None, flags=Qt.WindowFlags()):
@@ -24,53 +18,35 @@ class MainWindow(QWidget):
 
         self.config_window()
         self.set_mainscreen()
+        self.set_light_mode()
         self.event_handler()
         self.show()
 
     def config_window(self):
         self.setWindowTitle(TITLE)
         self.setGeometry(0, 0, WIDTH, HEIGHT)
-        self.setStyleSheet(f"background-color: rgb({WINDOW_COLOR}); {SET_STYLE}")
-
-    # def setup_styles(self):
-    # # Write it like standard CSS, targeting your screen class names
-    #     global_stylesheet = f"""
-    #         MainWindow {{
-    #             /* Default background */
-    #             background-color: {REST_COLOR}; 
-    #         }}
-            
-    #         QLabel {{
-    #             color: {TEXT_COLOR};
-    #             font-size: 16px;
-    #         }}
-            
-    #         QPushButton {{
-    #             color: {TEXT_COLOR};
-    #             background-color: #333333; /* Example button color */
-    #             border-radius: 15px;
-    #             padding: 8px 15px;
-    #             font-size: 14px;
-    #         }}
-            
-    #         QPushButton:hover {{
-    #             background-color: #444444; /* Quick bonus hover effect */
-    #         }}
-    #     """
-    #     self.setStyleSheet(global_stylesheet)
+        self.setStyleSheet(f"background-color: rgb{WINDOW_LIGHT};")
 
     def set_mainscreen(self):
         ## ESTABLECER DISENO DE LA VENTANA
         self.label = QLabel(f"Welcome to {TITLE}!")
+
         self.timer = QLabel("25:00", self)
+
         self.start_button = QPushButton("Start temporizer")
         self.stop_button = QPushButton("Stop Temporizer")
+        self.mode_button = QPushButton("🌙 Mode")
+
+        self.start_button.setFixedSize(300, 75)
+        self.stop_button.setFixedSize(300, 75)
+
 
         self.main_Layout = QVBoxLayout()
         self.main_Layout.addWidget(self.label, alignment=Qt.AlignCenter)
         self.main_Layout.addWidget(self.timer, alignment=Qt.AlignCenter)
         self.main_Layout.addWidget(self.start_button, alignment=Qt.AlignCenter)
         self.main_Layout.addWidget(self.stop_button, alignment=Qt.AlignCenter)
+        self.main_Layout.addWidget(self.mode_button, alignment=Qt.AlignBottom)
 
         self.stop_button.hide()
         self.timer.hide()
@@ -89,6 +65,11 @@ class MainWindow(QWidget):
         self.stop_button.show()
 
     def rest_screen(self):
+        if not self.is_light_mode:
+            self.setStyleSheet(f"background-color: rgb{REST_DARK};")
+        else:   
+            self.setStyleSheet(f"background-color: rgb{REST_LIGHT};")
+        self.rest_screen = True
         self.label.setText("Its rest time!")
         self.stop_button.hide()
         self.rest_temporizer()
@@ -126,8 +107,41 @@ class MainWindow(QWidget):
         self.timer.setText(self.time_left.toString("mm:ss"))
         self.timer_engine.start(1000)
 
+    def set_light_mode(self):
+        if self.rest_screen:
+            self.setStyleSheet(f"background-color: rgb{REST_LIGHT};")
+        else:
+            self.setStyleSheet(f"background-color: rgb{WINDOW_LIGHT};")
+        self.label.setStyleSheet(SET_LABEL_STYLE)
+        self.timer.setStyleSheet(SET_TIMER_STYLE)
+        self.start_button.setStyleSheet(BUTTON_STYLE_LIGHT)
+        self.stop_button.setStyleSheet(BUTTON_STYLE_LIGHT)
+        self.mode_button.setStyleSheet(BUTTON_STYLE_LIGHT)
+        self.is_light_mode = True
+
+    def set_dark_mode(self):
+        if self.rest_screen:
+            self.setStyleSheet(f"background-color: rgb{REST_DARK};")
+        else:   
+            self.setStyleSheet(f"background-color: rgb{WINDOW_DARK};")
+        self.label.setStyleSheet(SET_LABEL_STYLE)
+        self.timer.setStyleSheet(SET_TIMER_STYLE)
+        self.start_button.setStyleSheet(BUTTON_STYLE_DARK)
+        self.stop_button.setStyleSheet(BUTTON_STYLE_DARK)
+        self.mode_button.setStyleSheet(BUTTON_STYLE_DARK)
+        self.is_light_mode = False
+
+    def alternate_mode(self):
+        if self.is_light_mode:
+            self.set_dark_mode()
+            self.mode_button.setText("🌞 Mode")
+        else:
+            self.set_light_mode()
+            self.mode_button.setText("🌙 Mode")
+
     def event_handler(self):
         self.start_button.clicked.connect(self.start_temporizer)
         self.stop_button.clicked.connect(self.stop_temporizer)
+        self.mode_button.clicked.connect(self.alternate_mode)
 
 run()
