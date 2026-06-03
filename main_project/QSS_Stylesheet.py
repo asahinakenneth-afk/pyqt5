@@ -20,6 +20,8 @@ FONT = "Consolas"
 FONT_SIZE = 32
 SET_LABEL_STYLE = f"""color: rgb{TEXT_COLOR}; font-size: {FONT_SIZE}px; font-family: {FONT};"""
 
+SET_COUNTER_STYLE = f"""color: rgb{TEXT_COLOR}; font-size: 12px; font-family: {FONT};"""
+
 SET_TIMER_STYLE = f"""color: rgb{TEXT_COLOR}; font-size: 346px; font-family: {FONT};"""
 
 BUTTON_STYLE_LIGHT = f"""
@@ -56,8 +58,8 @@ BUTTON_STYLE_DARK = f"""
         font-weight: bold;
         border-style: solid;
         border: 4px solid #000000;
-        border-top: 4px solid #ffffff;
-        border-left: 4px solid #ffffff;
+        border-top: 4px solid #BA7070;
+        border-left: 4px solid #BA7070;
         border-bottom: 4px solid #8B0000;
         border-right: 4px solid #8B0000;
     }}
@@ -67,8 +69,8 @@ BUTTON_STYLE_DARK = f"""
     QPushButton:pressed {{
         border-top: 4px solid #8B0000;
         border-left: 4px solid #8B0000;
-        border-bottom: 4px solid #ffffff;
-        border-right: 4px solid #ffffff;
+        border-bottom: 4px solid #BA7070;
+        border-right: 4px solid #BA7070;
     }}
 """
 
@@ -106,8 +108,8 @@ BUTTON_REST_STYLE_DARK = f"""
         font-weight: bold;
         border-style: solid;
         border: 4px solid #000000;
-        border-top: 4px solid #ffffff;
-        border-left: 4px solid #ffffff;
+        border-top: 4px solid #909B9E;
+        border-left: 4px solid #909B9E;
         border-bottom: 4px solid #002833;
         border-right: 4px solid #002833;
     }}
@@ -117,7 +119,7 @@ BUTTON_REST_STYLE_DARK = f"""
     QPushButton:pressed {{
         border-top: 4px solid #002833;
         border-left: 4px solid #002833;
-        border-bottom: 4px solid #ffffff;
-        border-right: 4px solid #ffffff;
+        border-bottom: 4px solid #909B9E;
+        border-right: 4px solid #909B9E;
     }}
 """

@@ -3,6 +3,7 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt, QTimer, QTime
 from pyautogui import size
 from QSS_Stylesheet import *
+from popups import *
 
 def run():
     app = QApplication([])
@@ -11,8 +12,6 @@ def run():
 
 WIDTH, HEIGHT = size()
 TITLE = "Pomodoro Temporizer"
-DEFAULT_TIME = "25:00"
-DEFAULT_REST_TIME = "05:00"
 
 class MainWindow(QWidget):
     def __init__(self, parent=None, flags=Qt.WindowFlags()):
@@ -30,11 +29,14 @@ class MainWindow(QWidget):
         self.setStyleSheet(f"background-color: rgb{WINDOW_LIGHT};")
 
     def set_mainscreen(self):
+        self.default_time = "25:00"
+        self.default_rest_time = "05:00"
+        self.usage_count = 0
         self.is_rest_screen = False
         ## ESTABLECER DISENO DE LA VENTANA
         self.label = QLabel(f"Welcome to {TITLE}!")
-
-        self.timer = QLabel(DEFAULT_TIME, self)
+        self.counter = QLabel(f"You've concentrated {self.usage_count} times!")
+        self.timer = QLabel(self.default_time, self)
 
         self.config_button = QPushButton("⚙️")
         self.about_button = QPushButton("❓")
@@ -56,6 +58,7 @@ class MainWindow(QWidget):
         self.down_button_Layout = QHBoxLayout()
 
         self.up_button_Layout.addWidget(self.config_button, alignment=Qt.AlignLeft)
+        self.up_button_Layout.addWidget(self.counter, alignment=Qt.AlignCenter)
         self.up_button_Layout.addWidget(self.about_button, alignment=Qt.AlignRight)
 
         self.down_button_Layout.addWidget(self.start_button)
@@ -69,6 +72,7 @@ class MainWindow(QWidget):
         self.main_Layout.addWidget(self.mode_button, alignment=Qt.AlignBottom)
 
         self.stop_button.hide()
+        self.counter.hide()
         self.timer.hide()
         self.return_button.hide()
 
@@ -84,23 +88,27 @@ class MainWindow(QWidget):
         else:
             self.set_dark_mode()
         self.label.setText("Temporizer started")
-        self.timer.setText(DEFAULT_TIME)
+        self.timer.setText(self.default_time)
 
         self.start_button.hide()
 
         self.timer.show()
+        self.counter.hide()
         self.stop_button.show()
         self.return_button.show()
 
     def rest_screen(self):
         self.is_rest_screen = True
+        self.usage_count += 1
+        self.counter.setText(f"You've concentrated {self.usage_count} times!")
         if self.is_light_mode:
             self.set_light_mode()
         else:   
             self.set_dark_mode()
         self.label.setText("Its rest time!")
-        self.timer.setText(DEFAULT_REST_TIME)
+        self.timer.setText(self.default_rest_time)
         self.stop_button.hide()
+        self.counter.show()
         self.rest_temporizer()
         self.update_timer()
 
@@ -111,6 +119,7 @@ class MainWindow(QWidget):
         else:   
             self.set_dark_mode()
         self.label.setText(f"Welcome to {TITLE}!")
+        self.counter.hide()
         self.return_button.hide()
         self.stop_button.hide()
         self.start_button.show()
@@ -168,6 +177,7 @@ class MainWindow(QWidget):
             self.mode_button.setStyleSheet(BUTTON_STYLE_LIGHT)
             self.return_button.setStyleSheet(BUTTON_STYLE_LIGHT)
         self.label.setStyleSheet(SET_LABEL_STYLE)
+        self.counter.setStyleSheet(SET_COUNTER_STYLE)
         self.timer.setStyleSheet(SET_TIMER_STYLE)
         self.is_light_mode = True
 
@@ -189,6 +199,7 @@ class MainWindow(QWidget):
             self.mode_button.setStyleSheet(BUTTON_STYLE_DARK)
             self.return_button.setStyleSheet(BUTTON_STYLE_DARK)
         self.label.setStyleSheet(SET_LABEL_STYLE)
+        self.counter.setStyleSheet(SET_COUNTER_STYLE)
         self.timer.setStyleSheet(SET_TIMER_STYLE)
         self.is_light_mode = False
 
