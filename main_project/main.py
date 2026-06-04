@@ -6,6 +6,7 @@ from PyQt5.QtCore import Qt, QTimer, QTime
 from pyautogui import size
 from QSS_Stylesheet import *
 from popups import *
+from time import sleep
 
 def run():
     app = QApplication([])
@@ -13,7 +14,7 @@ def run():
     app.exec_()
 
 ## Gracias Gemini por resolverme la duda
-myappid = 'pomodoro.pixelart.1.0' 
+myappid = 'pomodoro.1.0' 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 WIDTH, HEIGHT = size()
 
@@ -51,6 +52,7 @@ class MainWindow(QWidget):
         self.about_button = QPushButton("❓")
 
         self.start_button = QPushButton("Start temporizer")
+        self.re_start_button = QPushButton("Continue temporizer")
         self.stop_button = QPushButton("Stop Temporizer")
         self.return_button = QPushButton("Return to main screen")
         self.mode_button = QPushButton("🌙 Mode")
@@ -58,9 +60,10 @@ class MainWindow(QWidget):
         self.config_button.setFixedSize(75, 75)
         self.about_button.setFixedSize(75, 75)
 
-        self.start_button.setFixedSize(300, 75)
-        self.stop_button.setFixedSize(300, 75)
-        self.return_button.setFixedSize(300, 75)
+        self.start_button.setFixedSize(360, 90)
+        self.re_start_button.setFixedSize(360, 90)
+        self.stop_button.setFixedSize(360, 90)
+        self.return_button.setFixedSize(360, 90)
 
         self.main_Layout = QVBoxLayout()
         self.up_button_Layout = QHBoxLayout()
@@ -71,6 +74,7 @@ class MainWindow(QWidget):
         self.up_button_Layout.addWidget(self.about_button, alignment=Qt.AlignRight)
 
         self.down_button_Layout.addWidget(self.start_button)
+        self.down_button_Layout.addWidget(self.re_start_button)
         self.down_button_Layout.addWidget(self.stop_button)
         self.down_button_Layout.addWidget(self.return_button)
 
@@ -82,6 +86,7 @@ class MainWindow(QWidget):
         self.main_Layout.addWidget(self.mode_button, alignment=Qt.AlignBottom)
 
         self.stop_button.hide()
+        self.re_start_button.hide()
         self.counter.hide()
         self.timer.hide()
         self.return_button.hide()
@@ -93,14 +98,15 @@ class MainWindow(QWidget):
 
     def open_about_screen(self):
         self.about_window = AboutWindow(self) ## Si no le pones el puto self se abre y se cierra al instante foking python
+        self.wait_time(0.5)
         self.about_window.show()
 
     def open_config_screen(self):
-    ## self.config_window = ConfigWindow()
-    ## self.config_window.exec_() ## Modo modal porque me da yuyu que la persona juguetee con la aplicación mientras se configura JAJJAJ
-        pass
+        self.config_window = ConfigWindow(self)
+        self.config_window.exec_() ## Modo modal porque me da yuyu que la persona juguetee con la aplicación mientras se configura JAJJAJ
 
     def pomodoro_screen(self):
+        self.wait_time(0.5)
         self.is_rest_screen = False
         if self.is_light_mode:
             self.set_light_mode()
@@ -110,13 +116,15 @@ class MainWindow(QWidget):
         self.timer.setText(self.default_time)
 
         self.start_button.hide()
+        self.counter.hide()
+        self.re_start_button.hide()
 
         self.timer.show()
-        self.counter.hide()
         self.stop_button.show()
         self.return_button.show()
 
     def rest_screen(self):
+        self.wait_time(0.5)
         self.is_rest_screen = True
         self.usage_count += 1
         self.counter.setText(f"You've concentrated {self.usage_count} times!")
@@ -124,25 +132,33 @@ class MainWindow(QWidget):
             self.set_light_mode()
         else:   
             self.set_dark_mode()
+
         self.label.setText("Its rest time!")
         self.timer.setText(self.default_rest_time)
         self.stop_button.hide()
         self.counter.show()
+        self.re_start_button.hide()
+
         self.rest_temporizer()
         self.update_timer()
 
     def return_main_screen(self):
+        self.wait_time(0.5)
         self.is_rest_screen = False
         if self.is_light_mode:
             self.set_light_mode()
         else:   
             self.set_dark_mode()
         self.label.setText(f"Welcome to {TITLE}!")
+
         self.counter.hide()
         self.return_button.hide()
         self.stop_button.hide()
-        self.start_button.show()
+        self.re_start_button.hide()
         self.timer.hide()
+
+        self.start_button.show()
+
         self.timer_engine.stop()
 
     def update_timer(self):
@@ -167,12 +183,17 @@ class MainWindow(QWidget):
         self.time_left = QTime(0, 0, 25) ## 25 "minutitos"
         self.timer_engine.start(1200) # que tan lento baja el contador de tiempo
 
+    def continue_temporizer(self):
+        self.timer_engine.start(1200)
+        self.stop_button.show()
+        self.re_start_button.hide()
+
     def stop_temporizer(self):
         self.label.setText("Temporizer stopped")
         self.timer_engine.stop()
 
         self.stop_button.hide()
-        self.start_button.show()
+        self.re_start_button.show()
         
     def rest_temporizer(self):
         if self.usage_count % 4 == 0 and self.usage_count != 0: ## Cada 4 pomodoros, un descanso largo
@@ -182,12 +203,14 @@ class MainWindow(QWidget):
         self.timer_engine.start(1800)
 
     def set_light_mode(self):
+        self.wait_time(0.2)
         if self.is_rest_screen:
             self.setStyleSheet(f"background-color: rgb{REST_LIGHT};")
             self.config_button.setStyleSheet(BUTTON_REST_STYLE_LIGHT)
             self.about_button.setStyleSheet(BUTTON_REST_STYLE_LIGHT)
             self.start_button.setStyleSheet(BUTTON_REST_STYLE_LIGHT)
             self.stop_button.setStyleSheet(BUTTON_REST_STYLE_LIGHT)
+            self.re_start_button.setStyleSheet(BUTTON_REST_STYLE_LIGHT)
             self.mode_button.setStyleSheet(BUTTON_REST_STYLE_LIGHT)
             self.return_button.setStyleSheet(BUTTON_REST_STYLE_LIGHT)
         else:
@@ -196,6 +219,7 @@ class MainWindow(QWidget):
             self.about_button.setStyleSheet(BUTTON_STYLE_LIGHT)
             self.start_button.setStyleSheet(BUTTON_STYLE_LIGHT)
             self.stop_button.setStyleSheet(BUTTON_STYLE_LIGHT)
+            self.re_start_button.setStyleSheet(BUTTON_STYLE_LIGHT)
             self.mode_button.setStyleSheet(BUTTON_STYLE_LIGHT)
             self.return_button.setStyleSheet(BUTTON_STYLE_LIGHT)
         self.is_light_mode = True
@@ -207,10 +231,9 @@ class MainWindow(QWidget):
             else:
                 self.about_window.setStyleSheet(f"background-color: rgb{WINDOW_LIGHT};")
                 self.about_window.about_creator.setStyleSheet(BUTTON_STYLE_LIGHT)
-            self.about_window.welcome.setStyleSheet(f"color: rgb{TEXT_COLOR}; font-size: 24px; font-family: {FONT};")
-
 
     def set_dark_mode(self):
+        self.wait_time(0.2)
         if self.is_rest_screen:
             self.setStyleSheet(f"background-color: rgb{REST_DARK};")
 
@@ -218,6 +241,7 @@ class MainWindow(QWidget):
             self.about_button.setStyleSheet(BUTTON_REST_STYLE_DARK)
             self.start_button.setStyleSheet(BUTTON_REST_STYLE_DARK)
             self.stop_button.setStyleSheet(BUTTON_REST_STYLE_DARK)
+            self.re_start_button.setStyleSheet(BUTTON_REST_STYLE_DARK)
             self.mode_button.setStyleSheet(BUTTON_REST_STYLE_DARK)
             self.return_button.setStyleSheet(BUTTON_REST_STYLE_DARK)
 
@@ -227,6 +251,7 @@ class MainWindow(QWidget):
             self.about_button.setStyleSheet(BUTTON_STYLE_DARK)
             self.start_button.setStyleSheet(BUTTON_STYLE_DARK)
             self.stop_button.setStyleSheet(BUTTON_STYLE_DARK)
+            self.re_start_button.setStyleSheet(BUTTON_STYLE_DARK)
             self.mode_button.setStyleSheet(BUTTON_STYLE_DARK)
             self.return_button.setStyleSheet(BUTTON_STYLE_DARK)
         self.is_light_mode = False
@@ -238,7 +263,6 @@ class MainWindow(QWidget):
             else:
                 self.about_window.setStyleSheet(f"background-color: rgb{WINDOW_DARK};")
                 self.about_window.about_creator.setStyleSheet(BUTTON_STYLE_DARK)
-            self.about_window.welcome.setStyleSheet(f"color: rgb(168, 15, 54); font-size: 24px; font-family: {FONT};")
 
     def alternate_mode(self):
         if self.is_light_mode:
@@ -248,10 +272,15 @@ class MainWindow(QWidget):
             self.set_light_mode()
             self.mode_button.setText("🌙 Mode")
 
+    def wait_time(self, seconds):
+        global sleep
+        sleep(seconds)
+
     def event_handler(self):
         self.about_button.clicked.connect(self.open_about_screen)
         self.config_button.clicked.connect(self.open_config_screen)
         self.start_button.clicked.connect(self.start_temporizer)
+        self.re_start_button.clicked.connect(self.continue_temporizer)
         self.stop_button.clicked.connect(self.stop_temporizer)
         self.mode_button.clicked.connect(self.alternate_mode)
         self.return_button.clicked.connect(self.return_main_screen)
