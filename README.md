@@ -8,4 +8,5 @@ Execute the **main.py** file *(make sure you have the proper modules installed)*
 
 Credits for the icons to:
 <a href="https://www.flaticon.es/iconos-gratis/pixeles" title="píxeles iconos">Pixel icons created by cubydesign - Flaticon</a>
+<a href="https://www.flaticon.es/iconos-gratis/pixeles" title="píxeles iconos">Pixel icon created by cubydesign - Flaticon</a>
 <a href="https://www.flaticon.es/iconos-gratis/pixel" title="pixel iconos">Pixel icon created by Freepik - Flaticon</a>
