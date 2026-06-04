@@ -175,7 +175,10 @@ class MainWindow(QWidget):
         self.start_button.show()
         
     def rest_temporizer(self):
-        self.time_left = QTime(0, 0, 5) ## 5 minutitos de descanso
+        if self.usage_count % 4 == 0 and self.usage_count != 0: ## Cada 4 pomodoros, un descanso largo
+            self.time_left = QTime(0, 0, 15) ## 15 minutitos de descanso largo
+        else:
+            self.time_left = QTime(0, 0, 5) ## 5 minutitos de descanso
         self.timer_engine.start(1800)
 
     def set_light_mode(self):
