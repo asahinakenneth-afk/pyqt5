@@ -1,4 +1,6 @@
-WINDOW_LIGHT = (255, 199, 222)
+TITLE = "Pomodoro Temporizer"
+
+WINDOW_LIGHT = (255, 189, 203)
 WINDOW_DARK = (54, 11, 27)
 TEMPORIZER_LIGHT = (255, 157, 143)
 TEMPORIZER_DARK = (41, 5, 6)
@@ -16,20 +18,20 @@ BUTTON_REST_DARK = (5, 61, 77)
 BUTTON_REST_HOVER_LIGHT = (56, 167, 217)
 BUTTON_REST_HOVER_DARK = (0, 11, 20)
 
-FONT = "Consolas"
-FONT_SIZE = 32
-SET_LABEL_STYLE = f"""color: rgb{TEXT_COLOR}; font-size: {FONT_SIZE}px; font-family: {FONT};"""
 
-SET_COUNTER_STYLE = f"""color: rgb{TEXT_COLOR}; font-size: 12px; font-family: {FONT};"""
+FONT = "rainyhearts"
+SET_LABEL_STYLE = f"""color: rgb{TEXT_COLOR}; font-size: 32px; font-family: {FONT};"""
 
-SET_TIMER_STYLE = f"""color: rgb{TEXT_COLOR}; font-size: 346px; font-family: {FONT};"""
+SET_COUNTER_STYLE = f"""color: rgb{TEXT_COLOR}; font-size: 16px; font-family: {FONT};"""
+
+SET_TIMER_STYLE = f"""color: rgb{TEXT_COLOR}; font-size: 384px; font-family: {FONT};"""
 
 BUTTON_STYLE_LIGHT = f"""
     QPushButton {{
         background-color: rgb{BUTTON_LIGHT};
         color: #FFFFFF;
         font-family: '{FONT}';
-        font-size: 24px;
+        font-size: 28px;
         font-weight: bold;
         border-style: solid;
         border: 4px solid #000000;
@@ -54,7 +56,7 @@ BUTTON_STYLE_DARK = f"""
         background-color: rgb{BUTTON_DARK};
         color: #FFFFFF;
         font-family: '{FONT}';
-        font-size: 24px;
+        font-size: 28px;
         font-weight: bold;
         border-style: solid;
         border: 4px solid #000000;
@@ -79,7 +81,7 @@ BUTTON_REST_STYLE_LIGHT = f"""
         background-color: rgb{BUTTON_REST_LIGHT};
         color: #FFFFFF;
         font-family: '{FONT}';
-        font-size: 24px;
+        font-size: 28px;
         font-weight: bold;
         border-style: solid;
         border: 4px solid #000000;
@@ -104,7 +106,7 @@ BUTTON_REST_STYLE_DARK = f"""
         background-color: rgb{BUTTON_REST_DARK};
         color: #FFFFFF;
         font-family: '{FONT}';
-        font-size: 24px;
+        font-size: 28px;
         font-weight: bold;
         border-style: solid;
         border: 4px solid #000000;

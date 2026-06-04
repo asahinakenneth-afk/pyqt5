@@ -1,5 +1,7 @@
-from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QLineEdit
-from PyQt5.QtGui import QFont
+import sys
+import ctypes
+from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QVBoxLayout, QHBoxLayout
+from PyQt5.QtGui import QFontDatabase, QIcon
 from PyQt5.QtCore import Qt, QTimer, QTime
 from pyautogui import size
 from QSS_Stylesheet import *
@@ -10,13 +12,15 @@ def run():
     window = MainWindow()
     app.exec_()
 
+## Gracias Gemini por resolverme la duda
+myappid = 'pomodoro.pixelart.1.0' 
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 WIDTH, HEIGHT = size()
-TITLE = "Pomodoro Temporizer"
 
 class MainWindow(QWidget):
     def __init__(self, parent=None, flags=Qt.WindowFlags()):
         super().__init__(parent=parent, flags=flags)
-
+        QFontDatabase.addApplicationFont("rainyhearts.ttf")
         self.config_window()
         self.set_mainscreen()
         self.set_light_mode()
@@ -27,6 +31,7 @@ class MainWindow(QWidget):
         self.setWindowTitle(TITLE)
         self.setGeometry(0, 0, WIDTH, HEIGHT)
         self.setStyleSheet(f"background-color: rgb{WINDOW_LIGHT};")
+        self.setWindowIcon(QIcon("logo.png"))
 
     def set_mainscreen(self):
         self.default_time = "25:00"
@@ -37,6 +42,10 @@ class MainWindow(QWidget):
         self.label = QLabel(f"Welcome to {TITLE}!")
         self.counter = QLabel(f"You've concentrated {self.usage_count} times!")
         self.timer = QLabel(self.default_time, self)
+
+        self.label.setStyleSheet(SET_LABEL_STYLE)
+        self.counter.setStyleSheet(SET_COUNTER_STYLE)
+        self.timer.setStyleSheet(SET_TIMER_STYLE)
 
         self.config_button = QPushButton("⚙️")
         self.about_button = QPushButton("❓")
@@ -68,6 +77,7 @@ class MainWindow(QWidget):
         self.main_Layout.addLayout(self.up_button_Layout)
         self.main_Layout.addWidget(self.label, alignment=Qt.AlignCenter)
         self.main_Layout.addWidget(self.timer, alignment=Qt.AlignCenter)
+
         self.main_Layout.addLayout(self.down_button_Layout)
         self.main_Layout.addWidget(self.mode_button, alignment=Qt.AlignBottom)
 
@@ -80,6 +90,15 @@ class MainWindow(QWidget):
         self.timer_engine.timeout.connect(self.update_timer) ## La conecta a la funcion que actualiza el tiempo
 
         self.setLayout(self.main_Layout)
+
+    def open_about_screen(self):
+        self.about_window = AboutWindow(self) ## Si no le pones el puto self se abre y se cierra al instante foking python
+        self.about_window.show()
+
+    def open_config_screen(self):
+    ## self.config_window = ConfigWindow()
+    ## self.config_window.exec_() ## Modo modal porque me da yuyu que la persona juguetee con la aplicación mientras se configura JAJJAJ
+        pass
 
     def pomodoro_screen(self):
         self.is_rest_screen = False
@@ -176,20 +195,29 @@ class MainWindow(QWidget):
             self.stop_button.setStyleSheet(BUTTON_STYLE_LIGHT)
             self.mode_button.setStyleSheet(BUTTON_STYLE_LIGHT)
             self.return_button.setStyleSheet(BUTTON_STYLE_LIGHT)
-        self.label.setStyleSheet(SET_LABEL_STYLE)
-        self.counter.setStyleSheet(SET_COUNTER_STYLE)
-        self.timer.setStyleSheet(SET_TIMER_STYLE)
         self.is_light_mode = True
+
+        if hasattr(self, 'about_window') and self.about_window.isVisible():
+            if self.is_rest_screen:
+                self.about_window.setStyleSheet(f"background-color: rgb{REST_LIGHT};")
+                self.about_window.about_creator.setStyleSheet(BUTTON_REST_STYLE_LIGHT)
+            else:
+                self.about_window.setStyleSheet(f"background-color: rgb{WINDOW_LIGHT};")
+                self.about_window.about_creator.setStyleSheet(BUTTON_STYLE_LIGHT)
+            self.about_window.welcome.setStyleSheet(f"color: rgb{TEXT_COLOR}; font-size: 24px; font-family: {FONT};")
+
 
     def set_dark_mode(self):
         if self.is_rest_screen:
             self.setStyleSheet(f"background-color: rgb{REST_DARK};")
+
             self.config_button.setStyleSheet(BUTTON_REST_STYLE_DARK)
             self.about_button.setStyleSheet(BUTTON_REST_STYLE_DARK)
             self.start_button.setStyleSheet(BUTTON_REST_STYLE_DARK)
             self.stop_button.setStyleSheet(BUTTON_REST_STYLE_DARK)
             self.mode_button.setStyleSheet(BUTTON_REST_STYLE_DARK)
             self.return_button.setStyleSheet(BUTTON_REST_STYLE_DARK)
+
         else:   
             self.setStyleSheet(f"background-color: rgb{WINDOW_DARK};")
             self.config_button.setStyleSheet(BUTTON_STYLE_DARK)
@@ -198,10 +226,16 @@ class MainWindow(QWidget):
             self.stop_button.setStyleSheet(BUTTON_STYLE_DARK)
             self.mode_button.setStyleSheet(BUTTON_STYLE_DARK)
             self.return_button.setStyleSheet(BUTTON_STYLE_DARK)
-        self.label.setStyleSheet(SET_LABEL_STYLE)
-        self.counter.setStyleSheet(SET_COUNTER_STYLE)
-        self.timer.setStyleSheet(SET_TIMER_STYLE)
         self.is_light_mode = False
+
+        if hasattr(self, 'about_window') and self.about_window.isVisible():
+            if self.is_rest_screen:
+                self.about_window.setStyleSheet(f"background-color: rgb{REST_DARK};")
+                self.about_window.about_creator.setStyleSheet(BUTTON_REST_STYLE_DARK)
+            else:
+                self.about_window.setStyleSheet(f"background-color: rgb{WINDOW_DARK};")
+                self.about_window.about_creator.setStyleSheet(BUTTON_STYLE_DARK)
+            self.about_window.welcome.setStyleSheet(f"color: rgb(168, 15, 54); font-size: 24px; font-family: {FONT};")
 
     def alternate_mode(self):
         if self.is_light_mode:
@@ -212,6 +246,8 @@ class MainWindow(QWidget):
             self.mode_button.setText("🌙 Mode")
 
     def event_handler(self):
+        self.about_button.clicked.connect(self.open_about_screen)
+        self.config_button.clicked.connect(self.open_config_screen)
         self.start_button.clicked.connect(self.start_temporizer)
         self.stop_button.clicked.connect(self.stop_temporizer)
         self.mode_button.clicked.connect(self.alternate_mode)
