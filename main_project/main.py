@@ -1,9 +1,10 @@
 import sys
 import ctypes
+import json
+import languages
 from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QVBoxLayout, QHBoxLayout
 from PyQt5.QtGui import QFontDatabase, QIcon
 from PyQt5.QtCore import Qt, QTimer, QTime
-from pyautogui import size
 from QSS_Stylesheet import *
 from popups import *
 from time import sleep
@@ -13,35 +14,68 @@ def run():
     window = MainWindow()
     app.exec_()
 
-## Gracias Gemini por resolverme la duda
+## Gracias Gemini por resolverme la duda (sólo quería íconos bonitos...)
 myappid = 'pomodoro.1.0' 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-WIDTH, HEIGHT = size()
 
 class MainWindow(QWidget):
     def __init__(self, parent=None, flags=Qt.WindowFlags()):
         super().__init__(parent=parent, flags=flags)
+
         QFontDatabase.addApplicationFont("rainyhearts.ttf")
+        QFontDatabase.addApplicationFont("PixelMplus10-Regular.ttf")
+        
+        self.language = "en"
+        self.default_time = "25:00"
+        self.default_rest_time = "05:00"
+        self.usage_count = 0
+        self.title = languages.text[self.language]["title"]
+ 
+        self.config = "config.json"
+        ## Okay juro que lo único que pedí a la IA fue lo de abrir el archivo json, el try/error es mío
+        try: 
+            with open("config.json", "r", encoding="utf-8") as archivo:
+                data = json.load(archivo)
+
+                self.title = data["title"]
+                self.language = data["language"]
+                self.default_time = data["pomodoro_time"]
+                self.default_rest_time = data["rest_time"]
+        except FileNotFoundError:
+            pass
+
+        self.set_language()
         self.config_window()
-        self.set_mainscreen()
         self.set_light_mode()
         self.event_handler()
+        self.set_mainscreen()
         self.show()
 
     def config_window(self):
-        self.setWindowTitle(TITLE)
+        self.setWindowTitle(self.title)
         self.setGeometry(0, 0, WIDTH, HEIGHT)
         self.setStyleSheet(f"background-color: rgb{WINDOW_LIGHT};")
         self.setWindowIcon(QIcon("logo.png"))
 
+    def set_language(self):
+        ##TEXT
+        self.welcome_app_text = languages.text[self.language]["start_welcome"].format(self.title)
+        self.counter_text = languages.text[self.language]["counter"].format(self.usage_count)
+
+        ##BUTTONS
+
+
+
+
     def set_mainscreen(self):
+        global usage_count
         self.default_time = "25:00"
         self.default_rest_time = "05:00"
-        self.usage_count = 0
         self.is_rest_screen = False
         ## ESTABLECER DISENO DE LA VENTANA
-        self.label = QLabel(f"Welcome to {TITLE}!")
-        self.counter = QLabel(f"You've concentrated {self.usage_count} times!")
+
+        self.label = QLabel(self.welcome_app_text)
+        self.counter = QLabel(self.counter_text)
         self.timer = QLabel(self.default_time, self)
 
         self.label.setStyleSheet(SET_LABEL_STYLE)
@@ -92,7 +126,6 @@ class MainWindow(QWidget):
         self.return_button.hide()
 
         self.timer_engine = QTimer(self) ## Cuenta el tiempo, valga la redundancia
-        self.timer_engine.timeout.connect(self.update_timer) ## La conecta a la funcion que actualiza el tiempo
 
         self.setLayout(self.main_Layout)
 
@@ -124,10 +157,11 @@ class MainWindow(QWidget):
         self.return_button.show()
 
     def rest_screen(self):
+        global usage_count
         self.wait_time(0.5)
         self.is_rest_screen = True
         self.usage_count += 1
-        self.counter.setText(f"You've concentrated {self.usage_count} times!")
+        self.counter.setText(self.counter_text)
         if self.is_light_mode:
             self.set_light_mode()
         else:   
@@ -149,7 +183,7 @@ class MainWindow(QWidget):
             self.set_light_mode()
         else:   
             self.set_dark_mode()
-        self.label.setText(f"Welcome to {TITLE}!")
+        self.label.setText(self.welcome_app_text)
 
         self.counter.hide()
         self.return_button.hide()
@@ -277,6 +311,7 @@ class MainWindow(QWidget):
         sleep(seconds)
 
     def event_handler(self):
+        self.timer_engine.timeout.connect(self.update_timer) ## La conecta a la funcion que actualiza el tiempo
         self.about_button.clicked.connect(self.open_about_screen)
         self.config_button.clicked.connect(self.open_config_screen)
         self.start_button.clicked.connect(self.start_temporizer)

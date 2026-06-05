@@ -1,4 +1,6 @@
-TITLE = "Pomodoro Temporizer 🍅"
+from pyautogui import size 
+
+WIDTH, HEIGHT = size()
 
 WINDOW_LIGHT = (255, 189, 203)
 WINDOW_DARK = (54, 11, 27)
@@ -22,11 +24,17 @@ BUTTON_REST_HOVER_DARK = (0, 11, 20)
 
 
 FONT = "rainyhearts"
+FONT_JP = "PixelMplus10-Regular"
+
 SET_LABEL_STYLE = f"""color: rgb{TEXT_COLOR}; font-size: 64px; font-family: {FONT};"""
+SET_LABEL_STYLE_JP = f"""color: rgb{TEXT_COLOR}; font-size: 64 px; font-family:{FONT_JP}"""
 
 SET_COUNTER_STYLE = f"""color: rgb{TEXT_COLOR}; font-size: 24px; font-family: {FONT};"""
+SET_COUNTER_STYLE_JP = f"""color: rgb{TEXT_COLOR}; font-size: 24 px; font-family:{FONT_JP}"""
+
 
 SET_TIMER_STYLE = f"""color: rgb{TEXT_COLOR}; font-size: 512px; font-family: {FONT};"""
+SET_TIMER_STYLE_JP = f"""color: rgb{TEXT_COLOR}; font-size: 512 px; font-family:{FONT_JP}"""
 
 BUTTON_STYLE_LIGHT = f"""
     QPushButton {{
