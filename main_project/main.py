@@ -22,14 +22,13 @@ class MainWindow(QWidget):
     def __init__(self, parent=None, flags=Qt.WindowFlags()):
         super().__init__(parent=parent, flags=flags)
 
-        QFontDatabase.addApplicationFont("rainyhearts.ttf")
-        QFontDatabase.addApplicationFont("PixelMplus10-Regular.ttf")
+        QFontDatabase.addApplicationFont("fonts/rainyhearts.ttf")
+        QFontDatabase.addApplicationFont("fonts/PixelMplus10-Regular.ttf")
         
         self.language = "en"
         self.default_time = "25:00"
         self.default_rest_time = "05:00"
         self.usage_count = 0
-        self.title = languages.text[self.language]["title"]
  
         self.config = "config.json"
         ## Okay juro que lo único que pedí a la IA fue lo de abrir el archivo json, el try/error es mío
@@ -37,7 +36,6 @@ class MainWindow(QWidget):
             with open("config.json", "r", encoding="utf-8") as archivo:
                 data = json.load(archivo)
 
-                self.title = data["title"]
                 self.language = data["language"]
                 self.default_time = data["pomodoro_time"]
                 self.default_rest_time = data["rest_time"]
@@ -46,25 +44,35 @@ class MainWindow(QWidget):
 
         self.set_language()
         self.config_window()
-        self.set_light_mode()
-        self.event_handler()
         self.set_mainscreen()
+        self.event_handler()
+        self.set_light_mode()
         self.show()
 
     def config_window(self):
         self.setWindowTitle(self.title)
         self.setGeometry(0, 0, WIDTH, HEIGHT)
         self.setStyleSheet(f"background-color: rgb{WINDOW_LIGHT};")
-        self.setWindowIcon(QIcon("logo.png"))
+        self.setWindowIcon(QIcon("images/logo.png"))
 
     def set_language(self):
+        self.title = languages.text[self.language]["title"]
+
         ##TEXT
         self.welcome_app_text = languages.text[self.language]["start_welcome"].format(self.title)
         self.counter_text = languages.text[self.language]["counter"].format(self.usage_count)
 
+        self.temp_start_text = languages.text[self.language]["temp_start"]
+        self.tempt_stop_text = languages.text[self.language]["temp_stop"]
+        self.rest_text = languages.text[self.language]["rest"]
+
         ##BUTTONS
-
-
+        self.start_temp_btn = languages.button[self.language]["start"]
+        self.continue_temp_btn = languages.button[self.language]["continue"]
+        self.stop_temp_btn = languages.button[self.language]["stop"]
+        self.return_btn = languages.button[self.language]["return"]
+        self.mode_light_btn = languages.button[self.language]["mode_light"]
+        self.mode_dark_btn = languages.button[self.language]["mode_dark"]
 
 
     def set_mainscreen(self):
@@ -85,11 +93,11 @@ class MainWindow(QWidget):
         self.config_button = QPushButton("⚙️")
         self.about_button = QPushButton("❓")
 
-        self.start_button = QPushButton("Start temporizer")
-        self.re_start_button = QPushButton("Continue temporizer")
-        self.stop_button = QPushButton("Stop Temporizer")
-        self.return_button = QPushButton("Return to main screen")
-        self.mode_button = QPushButton("🌙 Mode")
+        self.start_button = QPushButton(self.start_temp_btn)
+        self.re_start_button = QPushButton(self.continue_temp_btn)
+        self.stop_button = QPushButton(self.stop_temp_btn)
+        self.return_button = QPushButton(self.return_btn)
+        self.mode_button = QPushButton(self.mode_dark_btn)
 
         self.config_button.setFixedSize(75, 75)
         self.about_button.setFixedSize(75, 75)
@@ -145,7 +153,7 @@ class MainWindow(QWidget):
             self.set_light_mode()
         else:
             self.set_dark_mode()
-        self.label.setText("Temporizer started")
+        self.label.setText(self.temp_start_text)
         self.timer.setText(self.default_time)
 
         self.start_button.hide()
@@ -167,7 +175,7 @@ class MainWindow(QWidget):
         else:   
             self.set_dark_mode()
 
-        self.label.setText("Its rest time!")
+        self.label.setText(self.rest_text)
         self.timer.setText(self.default_rest_time)
         self.stop_button.hide()
         self.counter.show()
@@ -223,7 +231,7 @@ class MainWindow(QWidget):
         self.re_start_button.hide()
 
     def stop_temporizer(self):
-        self.label.setText("Temporizer stopped")
+        self.label.setText(self.stop_temp_btn)
         self.timer_engine.stop()
 
         self.stop_button.hide()
@@ -301,10 +309,10 @@ class MainWindow(QWidget):
     def alternate_mode(self):
         if self.is_light_mode:
             self.set_dark_mode()
-            self.mode_button.setText("🌞 Mode")
+            self.mode_button.setText(self.mode_light_btn)
         else:
             self.set_light_mode()
-            self.mode_button.setText("🌙 Mode")
+            self.mode_button.setText(self.mode_dark_btn)
 
     def wait_time(self, seconds):
         global sleep
