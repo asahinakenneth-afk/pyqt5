@@ -164,14 +164,15 @@ class MainWindow(QWidget):
 
     def rest_screen(self):
         self.wait_time(0.5)
-        self.is_rest_screen = True
         self.usage_count += 1
-        self.counter.setText(self.counter_text)
+        self.is_rest_screen = True
         if self.is_light_mode:
             self.set_light_mode()
         else:   
             self.set_dark_mode()
 
+        self.counter_text = languages.text[self.language]["counter"].format(self.usage_count)
+        self.counter.setText(self.counter_text)
         self.label.setText(self.rest_text)
         self.timer.setText("05:00")
         self.stop_button.hide()
