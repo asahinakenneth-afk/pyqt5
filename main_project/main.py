@@ -64,7 +64,7 @@ class MainWindow(QWidget):
         self.counter_text = languages.text[self.language]["counter"].format(self.usage_count)
 
         self.temp_start_text = languages.text[self.language]["temp_start"]
-        self.tempt_stop_text = languages.text[self.language]["temp_stop"]
+        self.temp_stop_text = languages.text[self.language]["temp_stop"]
         self.rest_text = languages.text[self.language]["rest"]
 
         ##BUTTONS
@@ -77,7 +77,7 @@ class MainWindow(QWidget):
 
     def set_mainscreen(self):
         self.is_rest_screen = False
-        ## ESTABLECER DISENO DE LA VENTANA
+        ## ESTABLECER DISEÑO DE LA VENTANA
 
         self.label = QLabel(self.welcome_app_text)
         self.counter = QLabel(self.counter_text)
@@ -216,6 +216,7 @@ class MainWindow(QWidget):
                 self.rest_screen()
             else:
                 self.start_temporizer()
+                self.timer.setText(self.time_left.toString("mm:ss"))
                 self.is_rest_screen = False
 
     def start_temporizer(self):
@@ -224,12 +225,13 @@ class MainWindow(QWidget):
         self.timer_engine.start(1200) # que tan lento baja el contador de tiempo
 
     def continue_temporizer(self):
+        self.label.setText(self.temp_start_text)
         self.timer_engine.start(1200)
         self.stop_button.show()
         self.re_start_button.hide()
 
     def stop_temporizer(self):
-        self.label.setText(self.stop_temp_btn)
+        self.label.setText(self.temp_stop_text)
         self.timer_engine.stop()
 
         self.stop_button.hide()
@@ -237,9 +239,9 @@ class MainWindow(QWidget):
         
     def rest_temporizer(self):
         if self.usage_count % 4 == 0 and self.usage_count != 0: ## Cada 4 pomodoros, un descanso largo
-            self.time_left = QTime(0, 15, 0) ## 15 minutitos de descanso largo
+            self.time_left = QTime(0, 0, 15) ## 15 minutitos de descanso largo
         else:
-            self.time_left = QTime(0, 5, 0) ## 5 minutitos de descanso
+            self.time_left = QTime(0, 0, 5) ## 5 minutitos de descanso
         self.timer_engine.start(2000)
 
     def update_timer_live(self, new_time):

@@ -1,5 +1,5 @@
 import json
-from PyQt5.QtWidgets import QWidget, QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
+from PyQt5.QtWidgets import QWidget, QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QMessageBox
 from PyQt5.QtCore import Qt, QTime, pyqtSignal
 from PyQt5.QtGui import QPixmap, QIcon
 from QSS_Stylesheet import *
@@ -52,7 +52,7 @@ class AboutWindow(QDialog):
 
         self.tutorial.setStyleSheet(f"color: rgb{TEXT_COLOR}; font-size: 26px; font-family: {FONT};")
 
-        self.version = QLabel("Version 1.0")
+        self.version = QLabel("Version 1.2")
         self.version.setStyleSheet(f"color: rgb{TEXT_COLOR}; font-size: 22px; font-family: {FONT};")
 
         self.main_layout = QVBoxLayout()
@@ -83,6 +83,7 @@ class ConfigWindow(QDialog):
         if parent:
             self.setStyleSheet(parent.styleSheet())
             self.language = self.parent().language
+            self.is_spanish = (self.parent().language == "es")
 
         self.current_time = self.parent().default_time
 
@@ -176,7 +177,13 @@ class ConfigWindow(QDialog):
 
         self.container.hide()
         self.set_window_mode.hide()
-        self.english_mode.hide()
+
+        if self.is_spanish:
+            self.spanish_mode.hide()
+            self.english_mode.show()
+        else:    
+            self.english_mode.hide()
+            self.spanish_mode.show()
         self.return_button.hide()
 
         self.setLayout(self.main_layout)
@@ -219,14 +226,29 @@ class ConfigWindow(QDialog):
 
         else:
             self.set_full_screen.show()
-        self.spanish_mode.show()
+
+        if self.is_spanish:
+            self.english_mode.show()
+
+        else: 
+            self.spanish_mode.show()
         self.config_timers.show()
 
     def set_spanish(self):
-        pass
+        self.is_spanish = True
+        self.language = "es"
+        self.spanish_mode.hide()
+        self.english_mode.show()
+
+        QMessageBox.information(self, "Aviso", languages.text["es"]["restart"])
 
     def set_english(self):
-        pass
+        self.is_spanish = False
+        self.language = "en"
+        self.english_mode.hide()
+        self.spanish_mode.show()
+
+        QMessageBox.information(self, "Warning", languages.text["en"]["restart"])
 
     def full_screen_mode(self):
         self.parent().showFullScreen()
@@ -262,6 +284,8 @@ class ConfigWindow(QDialog):
     def event_handler(self):
         self.save_button.clicked.connect(self.save_settings)
         self.config_timers.clicked.connect(self.config_timers_screen)
+        self.spanish_mode.clicked.connect(self.set_spanish)
+        self.english_mode.clicked.connect(self.set_english)
         self.set_full_screen.clicked.connect(self.full_screen_mode)
         self.set_window_mode.clicked.connect(self.window_screen_mode)
         self.return_button.clicked.connect(self.return_config_screen)
