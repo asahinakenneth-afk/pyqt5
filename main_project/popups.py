@@ -1,5 +1,6 @@
+import json
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTime, pyqtSignal
 from PyQt5.QtGui import QPixmap, QIcon
 from QSS_Stylesheet import *
 import webbrowser
@@ -14,17 +15,17 @@ class AboutWindow(QDialog):
         self.set_language()
         self.setWindowTitle(self.title)
         self.setGeometry(0, 0, 1000, 400)
-        self.setWindowIcon(QIcon("about_logo.png"))
+        self.setWindowIcon(QIcon("images/about_logo.png"))
         self.about_screen()
 
     def set_language(self):
-        self.title = languages.text[self.parent().language]["about"]
+        self.title = languages.text[self.language]["about"]
 
-        self.welcome_text = languages.text[self.parent().language]["about_welcome"].format(self.parent().title)
-        self.about_info_text = languages.text[self.parent().language]["about_info"]
-        self.tutorial_text = languages.text[self.parent().language]["app_tutorial"]
+        self.welcome_text = languages.text[self.language]["about_welcome"].format(self.parent().title)
+        self.about_info_text = languages.text[self.language]["about_info"]
+        self.tutorial_text = languages.text[self.language]["app_tutorial"]
 
-        self.about_creator_btn = languages.button[self.parent().language]["about_creator"]
+        self.about_creator_btn = languages.button[self.language]["about_creator"]
 
 
     def about_screen(self):
@@ -36,10 +37,10 @@ class AboutWindow(QDialog):
 
         self.about.setStyleSheet(f"color: rgb{TEXT_COLOR}; font-size: 30px; font-family: {FONT};")
 
-        self.image = QLabel()
-        pixmap = QPixmap("autor.png")
+        self.author_image = QLabel()
+        pixmap = QPixmap("images/author.png")
         pixmap = pixmap.scaled(150, 150, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.image.setPixmap(pixmap)
+        self.author_image.setPixmap(pixmap)
 
         self.about_creator = QPushButton(self.about_creator_btn)
         if self.parent():
@@ -54,11 +55,22 @@ class AboutWindow(QDialog):
         self.version.setStyleSheet(f"color: rgb{TEXT_COLOR}; font-size: 22px; font-family: {FONT};")
 
         self.main_layout = QVBoxLayout()
-        self.main_layout.addWidget(self.welcome, alignment=Qt.AlignCenter)
-        self.main_layout.addWidget(self.about, alignment=Qt.AlignCenter)
+        self.head_layout = QHBoxLayout()
+        self.body_layout = QHBoxLayout()
+        self.creator_layout = QVBoxLayout()
+
+        self.head_layout.addWidget(self.welcome, alignment=Qt.AlignCenter)
+
+        self.creator_layout.addWidget(self.author_image, alignment=Qt.AlignCenter)
+        self.creator_layout.addWidget(self.about_creator, alignment=Qt.AlignCenter)
+
+        self.body_layout.addWidget(self.about, alignment=Qt.AlignLeft)
+        self.body_layout.addSpacing(15)
+        self.body_layout.addLayout(self.creator_layout)
+
+        self.main_layout.addLayout(self.head_layout)
+        self.main_layout.addLayout(self.body_layout)
         self.main_layout.addWidget(self.tutorial, alignment=Qt.AlignCenter)
-        self.main_layout.addWidget(self.image, alignment=Qt.AlignCenter)
-        self.main_layout.addWidget(self.about_creator, alignment=Qt.AlignCenter)
         self.main_layout.addWidget(self.version, alignment=Qt.AlignBottom)
 
         self.setLayout(self.main_layout)
@@ -68,6 +80,10 @@ class ConfigWindow(QDialog):
         super().__init__(parent=parent, flags=flags)
         if parent:
             self.setStyleSheet(parent.styleSheet())
+            self.language = self.language
+
+        self.current_time = self.parent().default_time
+        time_changed = pyqtSignal(QTime)
 
         self.set_language()
         self.setWindowTitle(self.title)
@@ -77,19 +93,21 @@ class ConfigWindow(QDialog):
         self.event_handler()
 
     def set_language(self):
-        self.title = languages.text[self.parent().language]["config"]
-        self.welcome_text = languages.text[self.parent().language]["config_welcome"]
-        self.timers_config_text = languages.text[self.parent().language]["timers_config"]
+        self.title = languages.text[self.language]["config"]
+        self.welcome_text = languages.text[self.language]["config_welcome"]
+        self.timers_config_text = languages.text[self.language]["timers_config"]
 
-        self.config_timer_btn = languages.button[self.parent().language]["config_time"] 
-        self.full_screen_btn = languages.button[self.parent().language]["full_screen"]   
-        self.window_mode_btn = languages.button[self.parent().language]["window_screen"]   
-        self.return_btn = languages.button[self.parent().language]["full_screen"]   
-        self.save_btn = languages.button[self.parent().language]["save"]
+        self.config_timer_btn = languages.button[self.language]["config_time"] 
+        self.full_screen_btn = languages.button[self.language]["full_screen"]   
+        self.window_mode_btn = languages.button[self.language]["window_screen"]   
+        self.return_btn = languages.button[self.language]["full_screen"]   
+        self.save_btn = languages.button[self.language]["save"]
 
     def config_screen(self):
         self.welcome = QLabel(self.welcome_text)
         self.welcome.setStyleSheet(f"color: rgb{TEXT_COLOR}; font-size: 30px; font-family: {FONT};")
+
+        self.current_time_label = QLabel(self.parent().default_time.toString("mm:ss"), self)
 
         self.config_timers = QPushButton(self.config_timer_btn)
         self.spanish_mode = QPushButton("Español")
@@ -99,6 +117,11 @@ class ConfigWindow(QDialog):
         self.return_button = QPushButton(self.return_btn)
         self.save_button = QPushButton(self.save_btn)
 
+        self.add_1_min = QPushButton("+1")
+        self.add_5_min = QPushButton("+5")
+        self.subs_1_min = QPushButton("-1")
+        self.subs_5_min = QPushButton("-5")
+
         self.config_timers.setFixedSize(300, 75)
         self.spanish_mode.setFixedSize(300, 75)
         self.english_mode.setFixedSize(300, 75)
@@ -106,6 +129,11 @@ class ConfigWindow(QDialog):
         self.set_full_screen.setFixedSize(300, 75)
         self.return_button.setFixedSize(300, 75)
         self.save_button.setFixedSize(300, 75)
+
+        self.add_1_min.setFixedSize(75, 75)
+        self.add_5_min.setFixedSize(75, 75)
+        self.subs_1_min.setFixedSize(75, 75)
+        self.subs_5_min.setFixedSize(75, 75)
 
         if self.parent():
             self.config_timers.setStyleSheet(self.parent().start_button.styleSheet())
@@ -116,7 +144,14 @@ class ConfigWindow(QDialog):
             self.return_button.setStyleSheet(self.parent().start_button.styleSheet())
             self.save_button.setStyleSheet(self.parent().start_button.styleSheet())
 
+            self.add_1_min.setStyleSheet(self.parent().start_button.styleSheet())
+            self.add_5_min.setStyleSheet(self.parent().start_button.styleSheet())
+            self.subs_1_min.setStyleSheet(self.parent().start_button.styleSheet())
+            self.subs_5_min.setStyleSheet(self.parent().start_button.styleSheet())
+
         self.main_layout = QVBoxLayout()
+
+        self.timers_layout = QHBoxLayout()
 
         self.main_layout.addWidget(self.welcome, alignment=Qt.AlignCenter)
         self.main_layout.addWidget(self.return_button, alignment=Qt.AlignCenter)
@@ -141,6 +176,20 @@ class ConfigWindow(QDialog):
 
         self.return_button.show()
 
+    def modify_time(self, mins):
+        new_time = self.current_time.addSecs(mins * 60)
+
+        if new_time <= QTime(0, 0, 0):
+            return
+        if new_time >= QTime(1, 0, 0):
+            return
+        
+        self.current_time = new_time
+
+        self.current_time_label.setText(self.current_time.toString("mm:ss"))
+
+        self.time_changed.emit(self.current_time)
+
     def return_config_screen(self):
         self.welcome.setText(self.welcome_text)
 
@@ -160,12 +209,32 @@ class ConfigWindow(QDialog):
         self.set_window_mode.hide()
         self.set_full_screen.show()
 
-    def save_changes(self):
-        pass
+    def save_settings(self):
+        config_data = {
+        "language": self.language,         
+        "default_timer": self.current_time_label,  
+
+        "default_time": {
+            "minutes": self.current_time.minute(),
+            "seconds": self.current_time.second()
+            }
+        }
+        
+        try:
+            with open("config.json", "w", encoding="utf-8") as f:
+                json.dump(config_data, f, indent=4, ensure_ascii=False)
+            
+        except Exception as e:
+                print(f"Error al guardar la configuración: {e}")
+        self.accept()
 
     def event_handler(self):
+        self.save_button.clicked.connect(self.save_settings)
         self.config_timers.clicked.connect(self.config_timers_screen)
         self.set_full_screen.clicked.connect(self.full_screen_mode)
         self.set_window_mode.clicked.connect(self.window_screen_mode)
-
+        self.add_1_min.clicked.connect(self.modify_time(1))
+        self.add_5_min.clicked.connect(self.modify_time(5))
+        self.subs_1_min.clicked.connect(self.modify_time(-1))
+        self.subs_5_min.clicked.connect(self.modify_time(-5))
 

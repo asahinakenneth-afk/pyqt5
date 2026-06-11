@@ -26,8 +26,8 @@ class MainWindow(QWidget):
         QFontDatabase.addApplicationFont("fonts/PixelMplus10-Regular.ttf")
         
         self.language = "en"
-        self.default_time = "25:00"
-        self.default_rest_time = "05:00"
+        self.default_timer = "25:00"
+        self.default_time = QTime(0, 25, 0)
         self.usage_count = 0
  
         self.config = "config.json"
@@ -37,8 +37,8 @@ class MainWindow(QWidget):
                 data = json.load(archivo)
 
                 self.language = data["language"]
+                self.default_timer = data["pomodoro_timer"]
                 self.default_time = data["pomodoro_time"]
-                self.default_rest_time = data["rest_time"]
         except FileNotFoundError:
             pass
 
@@ -74,17 +74,13 @@ class MainWindow(QWidget):
         self.mode_light_btn = languages.button[self.language]["mode_light"]
         self.mode_dark_btn = languages.button[self.language]["mode_dark"]
 
-
     def set_mainscreen(self):
-        global usage_count
-        self.default_time = "25:00"
-        self.default_rest_time = "05:00"
         self.is_rest_screen = False
         ## ESTABLECER DISENO DE LA VENTANA
 
         self.label = QLabel(self.welcome_app_text)
         self.counter = QLabel(self.counter_text)
-        self.timer = QLabel(self.default_time, self)
+        self.timer = QLabel(self.default_timer, self)
 
         self.label.setStyleSheet(SET_LABEL_STYLE)
         self.counter.setStyleSheet(SET_COUNTER_STYLE)
@@ -154,7 +150,7 @@ class MainWindow(QWidget):
         else:
             self.set_dark_mode()
         self.label.setText(self.temp_start_text)
-        self.timer.setText(self.default_time)
+        self.timer.setText(self.default_timer)
 
         self.start_button.hide()
         self.counter.hide()
@@ -176,7 +172,7 @@ class MainWindow(QWidget):
             self.set_dark_mode()
 
         self.label.setText(self.rest_text)
-        self.timer.setText(self.default_rest_time)
+        self.timer.setText("05:00")
         self.stop_button.hide()
         self.counter.show()
         self.re_start_button.hide()
@@ -222,7 +218,7 @@ class MainWindow(QWidget):
 
     def start_temporizer(self):
         self.pomodoro_screen()
-        self.time_left = QTime(0, 0, 25) ## 25 "minutitos"
+        self.time_left = self.default_time ## 25 "minutitos"
         self.timer_engine.start(1200) # que tan lento baja el contador de tiempo
 
     def continue_temporizer(self):
@@ -239,10 +235,10 @@ class MainWindow(QWidget):
         
     def rest_temporizer(self):
         if self.usage_count % 4 == 0 and self.usage_count != 0: ## Cada 4 pomodoros, un descanso largo
-            self.time_left = QTime(0, 0, 15) ## 15 minutitos de descanso largo
+            self.time_left = QTime(0, 15, 0) ## 15 minutitos de descanso largo
         else:
-            self.time_left = QTime(0, 0, 5) ## 5 minutitos de descanso
-        self.timer_engine.start(1800)
+            self.time_left = QTime(0, 5, 0) ## 5 minutitos de descanso
+        self.timer_engine.start(2000)
 
     def set_light_mode(self):
         self.wait_time(0.2)

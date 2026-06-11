@@ -13,9 +13,11 @@ text = {
         "about" : "about",
         "about_welcome" : "Welcome to the 'about' screen of {}",
         "about_info" : """
-            The pomodoro technique is a time management method developed by Francesco Cirillo in the late 1980s.
-    The technique uses a timer to break down work into intervals, usually 25 minutes in length, separated by short breaks!
-  The method is designed to improve focus and productivity, I hope it helps you to concentrate and manage your time better.""",
+The pomodoro technique is a time management method developed by Francesco Cirillo 
+in the late 1980s. The technique uses a timer to break down work into intervals, 
+usually 25 minutes in length, separated by short breaks!
+The method is designed to improve focus and productivity.
+I hope it helps you to concentrate and manage your time better.""",
         "app_tutorial" : """
                                     The usage of this app is very simple:\n
 1. Just click on the "Start Temporizer" button to start the pomodoro timer. 
