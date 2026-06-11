@@ -109,7 +109,7 @@ class MainWindow(QWidget):
         self.down_button_Layout = QHBoxLayout()
 
         self.up_button_Layout.addWidget(self.config_button, alignment=Qt.AlignLeft)
-        self.up_button_Layout.addWidget(self.counter, alignment=Qt.AlignRight)
+        self.up_button_Layout.addWidget(self.counter, alignment=Qt.AlignLeft)
         self.up_button_Layout.addWidget(self.about_button, alignment=Qt.AlignRight)
 
         self.down_button_Layout.addWidget(self.start_button)
