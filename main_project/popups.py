@@ -1,5 +1,5 @@
 import json
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
+from PyQt5.QtWidgets import QWidget, QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
 from PyQt5.QtCore import Qt, QTime, pyqtSignal
 from PyQt5.QtGui import QPixmap, QIcon
 from QSS_Stylesheet import *
@@ -11,6 +11,7 @@ class AboutWindow(QDialog):
         super().__init__(parent=parent, flags=flags)
         if parent:
             self.setStyleSheet(parent.styleSheet())
+            self.language = self.parent().language
 
         self.set_language()
         self.setWindowTitle(self.title)
@@ -76,14 +77,14 @@ class AboutWindow(QDialog):
         self.setLayout(self.main_layout)
 
 class ConfigWindow(QDialog):
+    time_changed = pyqtSignal(QTime)
     def __init__(self, parent=None, flags=Qt.WindowFlags()):
         super().__init__(parent=parent, flags=flags)
         if parent:
             self.setStyleSheet(parent.styleSheet())
-            self.language = self.language
+            self.language = self.parent().language
 
         self.current_time = self.parent().default_time
-        time_changed = pyqtSignal(QTime)
 
         self.set_language()
         self.setWindowTitle(self.title)
@@ -100,14 +101,17 @@ class ConfigWindow(QDialog):
         self.config_timer_btn = languages.button[self.language]["config_time"] 
         self.full_screen_btn = languages.button[self.language]["full_screen"]   
         self.window_mode_btn = languages.button[self.language]["window_screen"]   
-        self.return_btn = languages.button[self.language]["full_screen"]   
+        self.return_btn = languages.button[self.language]["return"]   
         self.save_btn = languages.button[self.language]["save"]
 
     def config_screen(self):
+        self.full_screen = False
+
         self.welcome = QLabel(self.welcome_text)
         self.welcome.setStyleSheet(f"color: rgb{TEXT_COLOR}; font-size: 30px; font-family: {FONT};")
 
         self.current_time_label = QLabel(self.parent().default_time.toString("mm:ss"), self)
+        self.current_time_label.setStyleSheet(f"color: rgb{TEXT_COLOR}; font-size: 30px; font-family: {FONT};")
 
         self.config_timers = QPushButton(self.config_timer_btn)
         self.spanish_mode = QPushButton("Español")
@@ -151,16 +155,26 @@ class ConfigWindow(QDialog):
 
         self.main_layout = QVBoxLayout()
 
-        self.timers_layout = QHBoxLayout()
+        self.container = QWidget(self)
+        self.timers_layout = QHBoxLayout(self.container)
+
+        self.timers_layout.addWidget(self.subs_5_min, alignment=Qt.AlignCenter)
+        self.timers_layout.addWidget(self.subs_1_min, alignment=Qt.AlignCenter)
+        self.timers_layout.addWidget(self.current_time_label, alignment=Qt.AlignCenter)
+        self.timers_layout.addWidget(self.add_1_min, alignment=Qt.AlignCenter)
+        self.timers_layout.addWidget(self.add_5_min, alignment=Qt.AlignCenter)
 
         self.main_layout.addWidget(self.welcome, alignment=Qt.AlignCenter)
+        self.main_layout.addWidget(self.container)
         self.main_layout.addWidget(self.return_button, alignment=Qt.AlignCenter)
         self.main_layout.addWidget(self.config_timers, alignment=Qt.AlignCenter)
         self.main_layout.addWidget(self.spanish_mode, alignment=Qt.AlignCenter)
         self.main_layout.addWidget(self.english_mode, alignment=Qt.AlignCenter)
         self.main_layout.addWidget(self.set_window_mode, alignment=Qt.AlignCenter)
         self.main_layout.addWidget(self.set_full_screen, alignment=Qt.AlignCenter)
+        self.main_layout.addWidget(self.save_button, alignment=Qt.AlignCenter)
 
+        self.container.hide()
         self.set_window_mode.hide()
         self.english_mode.hide()
         self.return_button.hide()
@@ -170,10 +184,14 @@ class ConfigWindow(QDialog):
     def config_timers_screen(self):
         self.welcome.setText(self.timers_config_text)
 
+        self.config_timers.hide()
+        self.english_mode.hide()
+        self.spanish_mode.hide()
         self.set_window_mode.hide()
         self.set_full_screen.hide()
         self.spanish_mode.hide()
 
+        self.container.show()
         self.return_button.show()
 
     def modify_time(self, mins):
@@ -194,25 +212,38 @@ class ConfigWindow(QDialog):
         self.welcome.setText(self.welcome_text)
 
         self.return_button.hide()
+        self.container.hide()
 
-        self.set_window_mode.show()
-        self.set_full_screen.show()
+        if self.full_screen:
+            self.set_window_mode.show()
+
+        else:
+            self.set_full_screen.show()
         self.spanish_mode.show()
+        self.config_timers.show()
+
+    def set_spanish(self):
+        pass
+
+    def set_english(self):
+        pass
 
     def full_screen_mode(self):
         self.parent().showFullScreen()
         self.set_full_screen.hide()
         self.set_window_mode.show()
+        self.full_screen = True
 
     def window_screen_mode(self):
         self.parent().showNormal()
         self.set_window_mode.hide()
         self.set_full_screen.show()
+        self.full_screen = False
 
     def save_settings(self):
         config_data = {
         "language": self.language,         
-        "default_timer": self.current_time_label,  
+        "default_timer": self.current_time_label.text(),  
 
         "default_time": {
             "minutes": self.current_time.minute(),
@@ -233,8 +264,9 @@ class ConfigWindow(QDialog):
         self.config_timers.clicked.connect(self.config_timers_screen)
         self.set_full_screen.clicked.connect(self.full_screen_mode)
         self.set_window_mode.clicked.connect(self.window_screen_mode)
-        self.add_1_min.clicked.connect(self.modify_time(1))
-        self.add_5_min.clicked.connect(self.modify_time(5))
-        self.subs_1_min.clicked.connect(self.modify_time(-1))
-        self.subs_5_min.clicked.connect(self.modify_time(-5))
+        self.return_button.clicked.connect(self.return_config_screen)
+        self.add_1_min.clicked.connect(lambda: self.modify_time(1))
+        self.add_5_min.clicked.connect(lambda: self.modify_time(5))
+        self.subs_1_min.clicked.connect(lambda: self.modify_time(-1))
+        self.subs_5_min.clicked.connect(lambda: self.modify_time(-5))
 

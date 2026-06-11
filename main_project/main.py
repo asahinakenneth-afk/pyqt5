@@ -37,8 +37,9 @@ class MainWindow(QWidget):
                 data = json.load(archivo)
 
                 self.language = data["language"]
-                self.default_timer = data["pomodoro_timer"]
-                self.default_time = data["pomodoro_time"]
+                self.default_timer = data["default_timer"]
+                time_data = data.get("default_time", {"minutes": 25, "seconds": 0})
+                self.default_time = QTime(0, time_data["minutes"], time_data["seconds"])
         except FileNotFoundError:
             pass
 
@@ -108,7 +109,7 @@ class MainWindow(QWidget):
         self.down_button_Layout = QHBoxLayout()
 
         self.up_button_Layout.addWidget(self.config_button, alignment=Qt.AlignLeft)
-        self.up_button_Layout.addWidget(self.counter, alignment=Qt.AlignCenter)
+        self.up_button_Layout.addWidget(self.counter, alignment=Qt.AlignRight)
         self.up_button_Layout.addWidget(self.about_button, alignment=Qt.AlignRight)
 
         self.down_button_Layout.addWidget(self.start_button)
@@ -140,6 +141,7 @@ class MainWindow(QWidget):
 
     def open_config_screen(self):
         self.config_window = ConfigWindow(self)
+        self.config_window.time_changed.connect(self.update_timer_live)
         self.config_window.exec_() ## Modo modal porque me da yuyu que la persona juguetee con la aplicación mientras se configura JAJJAJ
 
     def pomodoro_screen(self):
@@ -150,18 +152,17 @@ class MainWindow(QWidget):
         else:
             self.set_dark_mode()
         self.label.setText(self.temp_start_text)
-        self.timer.setText(self.default_timer)
 
         self.start_button.hide()
         self.counter.hide()
         self.re_start_button.hide()
+        self.config_button.hide()
 
         self.timer.show()
         self.stop_button.show()
         self.return_button.show()
 
     def rest_screen(self):
-        global usage_count
         self.wait_time(0.5)
         self.is_rest_screen = True
         self.usage_count += 1
@@ -196,6 +197,7 @@ class MainWindow(QWidget):
         self.timer.hide()
 
         self.start_button.show()
+        self.config_button.show()
 
         self.timer_engine.stop()
 
@@ -217,8 +219,8 @@ class MainWindow(QWidget):
                 self.is_rest_screen = False
 
     def start_temporizer(self):
-        self.pomodoro_screen()
         self.time_left = self.default_time ## 25 "minutitos"
+        self.pomodoro_screen()
         self.timer_engine.start(1200) # que tan lento baja el contador de tiempo
 
     def continue_temporizer(self):
@@ -239,6 +241,11 @@ class MainWindow(QWidget):
         else:
             self.time_left = QTime(0, 5, 0) ## 5 minutitos de descanso
         self.timer_engine.start(2000)
+
+    def update_timer_live(self, new_time):
+        self.default_time = new_time
+        self.time_left = new_time
+        self.timer.setText(self.time_left.toString("mm:ss"))
 
     def set_light_mode(self):
         self.wait_time(0.2)
