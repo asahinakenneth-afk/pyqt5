@@ -1,4 +1,7 @@
 # Pomodoro Temporizer!⏰
+
+---
+
 EN:
   The *pomodoro technique* is a time management method developed by Francesco Cirillo in the late 1980s.
 The technique uses a timer to break down work into intervals, usually **25 minutes in length**, separated by short breaks.
@@ -7,7 +10,7 @@ The technique uses a timer to break down work into intervals, usually **25 minut
 Tutorial:
 Execute the **main.py** file *(make sure you have the proper modules installed)*, then click on the "?" icon for further **usage instructions**. You can change the language in configurations.
 
-
+---
 
 ES:
   La *técnica pomodoro* es un método de gestión del tiempo desarrollado por Francesco Cirillo a finales de la década de 1980.  
@@ -17,7 +20,9 @@ Esta técnica utiliza un temporizador para dividir el trabajo en intervalos, nor
 Tutorial:
 Ejecuta el archivo main.py (asegúrate de tener los módulos adecuados instalados), luego haz clic en el icono "?" para obtener **más instrucciones de uso**. Puedes cambiar el idioma en configuraciones.
 
-Credits for the icons to:
+---
+
+Credits to:
 
 <a href="https://www.flaticon.es/iconos-gratis/pixeles" title="píxeles iconos">Pixel icons created by cubydesign - Flaticon</a> 
 
@@ -26,8 +31,6 @@ Credits for the icons to:
 <a href="https://www.flaticon.es/iconos-gratis/pixel" title="pixel iconos">Pixel icons created by Freepik - Flaticon</a>
 
 <a href="https://www.flaticon.es/iconos-gratis/pixel" title="pixel iconos">Pixel icons created por Dooder - Flaticon</a>
-
-and for the sound effects to: 
 
 <a href="https://pixabay.com/sound-effects/film-special-effects-bell-sound-370341/" title="Bell sound">Bell sound created by freesounds123</a>
 
