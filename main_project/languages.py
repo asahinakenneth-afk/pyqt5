@@ -24,21 +24,21 @@ I hope it helps you to concentrate and manage your time better.'""",
 2. When the timer reaches 0, it will automatically switch to the rest screen
 3. You can switch to light or dark mode with the button below the start button, 
 4. You can return to the main screen with the "Return to main screen" button!
-5. If you want to change the default time or rest time, just click on the "⚙️" button...
-    Then click on the buttons to adjust the time
-6. Click on "save" to save your time and language settings
+5. If you want to change the default time or default theme just click on the "⚙️" button...
+    Then click on the buttons to adjust the time or use the button to change the theme
+6. Click on "save" to save your time, theme and language settings
 7. If you want to full-size this app, also click on the "⚙️" button and then click on the "full-size mode" button!""",
 
     ## CONFIGWINDOW
         "config" : "config",
         "config_welcome" : "Configuration screen",
         "timers_config" : "Timer configuration",
-        "change_theme" : "Change default theme",
+        "change_theme" : "Change default theme to init",
 
     ## EXTRA
     "restart" : """
                 Language Change
-Please restart the application to apply the language.""",
+Please save and restart the app to apply""",
     "chamba_noti" : "Time to work! 💼",
     "chamba_message" : "It's time to study or work! 💖",
     "rest_noti" : "Take a rest 🍮",
@@ -71,21 +71,22 @@ Espero que te ayude a concentrarte y a gestionar mejor tu tiempo.'""",
 2. Cuando el temporizador llegue a 0, cambiará automáticamente a la pantalla de descanso
 3. Puedes cambiar al modo claro u oscuro con el botón debajo del botón de inicio
 4. ¡Puedes volver a la pantalla principal con el botón "Volver a la pantalla principal"!
-5. Si quieres cambiar el tiempo predeterminado o el tiempo de descanso, haz clic en el botón "⚙️"...
-    Luego utiliza los botones en pantalla para cambiar el tiempo al deseado
-6. Haz clic en "guardar" para guardar tus configuraciones (idioma y tiempo)
+5. Si quieres cambiar el tiempo predeterminado o el tema por defecto, haz clic en el botón "⚙️"...
+    Luego utiliza los botones en pantalla para cambiar el tiempo al deseado y clic en el botón
+    para cambiar el tema por defecto
+6. Haz clic en "guardar" para guardar tus configuraciones (idioma, tema y tiempo)
 7. ¡Si quieres poner la app en pantalla completa, también haz clic en el botón "⚙️" y luego en "Pantalla completa"!""",
 
         ## CONFIGWINDOW
         "config" : "config",
         "config_welcome" : "Pantalla de configuración",
         "timers_config" : "Configuración de temporizador",
-        "change_theme" : "Cambiar tema por defecto",
+        "change_theme" : "Cambiar tema por defecto al iniciar",
 
         ## RESTART
         "restart" : """
                 Cambio de idioma
-Por favor, reinicie la aplicación para aplicar el idioma.""",
+Guarde y reinicie la aplicación para aplicarlo""",
         "chamba_noti" : "¡Manos a la obra! 💼",
         "chamba_message" : "¡Es hora de trabajar o estudiar! 💖",
         "rest_noti" : "Tómate un descanso 🍮",

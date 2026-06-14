@@ -11,14 +11,14 @@ from popups import *
 from time import sleep
 
 ## Gracias Gemini por resolverme la duda (sólo quería íconos bonitos...)
-myappid = 'AsahinaKenneth.PomodoroTemporizer.1.4' 
+myappid = 'AsahinaKenneth.PomodoroTemporizer.1.5' 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 def run():
     app = QApplication([])
     app.setApplicationName("Pomodoro")
     app.setOrganizationName("Asahina-Kenneth") 
-    app.setApplicationVersion("1.4")
+    app.setApplicationVersion("1.5")
     window = MainWindow()
     app.exec_()
 
@@ -44,14 +44,14 @@ class MainWindow(QWidget):
         self.config = "config.json"
         ## Okay juro que lo único que pedí a la IA fue lo de abrir el archivo json, el try/error es mío
         try: 
-            with open("config.json", "r", encoding="utf-8") as archivo:
-                data = json.load(archivo)
+            with open("config.json", "r", encoding="utf-8") as archive:
+                data = json.load(archive)
 
                 self.language = data["language"]
                 self.default_timer = data["default_timer"]
                 time_data = data.get("default_time", {"minutes": 25, "seconds": 0})
                 self.default_time = QTime(0, time_data["minutes"], time_data["seconds"])
-                self.is_dark_mode = data["light_mode"]
+                self.is_light_mode = data["light_mode"]
                 self.is_full_screen = data["full_screen"]
         except FileNotFoundError:
             pass
@@ -77,7 +77,10 @@ class MainWindow(QWidget):
         self.notifier.setToolTip("Pomodoro")
         self.setWindowTitle(self.title)
         self.setGeometry(0, 0, WIDTH, HEIGHT)
-        self.setStyleSheet(f"background-color: rgb{WINDOW_LIGHT};")
+        if self.is_light_mode:
+            self.setStyleSheet(f"background-color: rgb{WINDOW_LIGHT};")
+        else:
+            self.setStyleSheet(f"background-color: rgb{WINDOW_DARK};")
         self.setWindowIcon(main_icon)
         self.notifier.setIcon(main_icon)
 
@@ -271,10 +274,10 @@ class MainWindow(QWidget):
     def rest_temporizer(self):
         if self.usage_count % 4 == 0 and self.usage_count != 0: ## Cada 4 pomodoros, un descanso largo
             self.timer.setText("15:00")
-            self.time_left = QTime(0, 0, 15) ## 15 minutitos de descanso largo
+            self.time_left = QTime(0, 15, 0) ## 15 minutitos de descanso largo
         else:
             self.timer.setText("05:00")
-            self.time_left = QTime(0, 0, 5) ## 5 minutitos de descanso
+            self.time_left = QTime(0, 5, 0) ## 5 minutitos de descanso
         self.timer_engine.start(2000)
 
     def update_timer_live(self, new_time):
@@ -379,7 +382,7 @@ class MainWindow(QWidget):
                 languages.text[self.language]["rest_noti"],
 languages.text[self.language]["rest_message"],
     self.notifier.icon(), # esto sirve para que el puto windows no muestre su icono todo pedorro feo
-    25*60)
+    30*60)
         else: 
             self.chamba_sound.play()
             
@@ -387,7 +390,7 @@ languages.text[self.language]["rest_message"],
             languages.text[self.language]["chamba_noti"],
 languages.text[self.language]["chamba_message"],
     self.notifier.icon(), # esto sirve para que el puto windows no muestre su icono todo pedorro feo
-    25*60
+    30*60
 )
 
     def event_handler(self):

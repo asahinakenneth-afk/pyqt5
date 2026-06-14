@@ -1,7 +1,7 @@
 import json
 from PyQt5.QtWidgets import QWidget, QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QMessageBox
 from PyQt5.QtCore import Qt, QTime, pyqtSignal
-from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtGui import QPixmap, QIcon, QFont
 from QSS_Stylesheet import *
 import webbrowser
 import languages 
@@ -57,7 +57,7 @@ class AboutWindow(QDialog):
 
         self.tutorial.setStyleSheet(f"color: rgb{TEXT_COLOR}; font-size: 26px; font-family: {FONT};")
 
-        self.version = QLabel("Version 1.4")
+        self.version = QLabel("Version 1.5")
         self.version.setStyleSheet(f"color: rgb{TEXT_COLOR}; font-size: 22px; font-family: {FONT};")
 
         self.main_layout = QVBoxLayout()
@@ -197,6 +197,7 @@ class ConfigWindow(QDialog):
         self.main_layout.addWidget(self.set_full_screen, alignment=Qt.AlignCenter)
         self.main_layout.addWidget(self.default_theme_label, alignment=Qt.AlignCenter)
         self.main_layout.addWidget(self.default_theme, alignment=Qt.AlignCenter)
+        self.main_layout.addSpacing(30)
         self.main_layout.addWidget(self.save_button, alignment=Qt.AlignCenter)
 
         self.container.hide()
@@ -225,6 +226,7 @@ class ConfigWindow(QDialog):
         self.spanish_mode.hide()
         self.set_window_mode.hide()
         self.set_full_screen.hide()
+        self.default_theme_label.hide()
         self.default_theme.hide()
         self.spanish_mode.hide()
 
@@ -263,6 +265,7 @@ class ConfigWindow(QDialog):
         else: 
             self.spanish_mode.show()
 
+        self.default_theme_label.show()
         self.default_theme.show()
         self.config_timers.show()
 
@@ -272,7 +275,27 @@ class ConfigWindow(QDialog):
         self.spanish_mode.hide()
         self.english_mode.show()
 
-        QMessageBox.information(self, "Aviso", languages.text["es"]["restart"])
+        msg = QMessageBox(self)
+        msg.setIcon(QMessageBox.Information)
+        msg.setWindowTitle("Aviso")
+        msg.setText(languages.text["es"]["restart"])
+        msg.setIconPixmap(QPixmap("images/warning.png").scaled(48,48))
+    
+        if self.parent().is_light_mode:
+            TEXT_COLOR = TEXT_COLOR_LIGHT
+            msg.setStyleSheet(f"""
+            QLabel {{ font-family: '{FONT}'; font-size: 22px; color: rgb{TEXT_COLOR}; }}
+            {BUTTON_STYLE_LIGHT}
+        """)
+        else:
+            TEXT_COLOR = TEXT_COLOR_DARK
+            msg.setStyleSheet(f"""
+            QLabel {{ font-family: '{FONT}'; font-size: 22px; color: rgb{TEXT_COLOR}; }}
+            {BUTTON_STYLE_DARK} 
+        """)
+
+        msg.exec_()
+
 
     def set_english(self):
         self.is_spanish = False
@@ -280,29 +303,48 @@ class ConfigWindow(QDialog):
         self.english_mode.hide()
         self.spanish_mode.show()
 
-        QMessageBox.information(self, "Warning", languages.text["en"]["restart"])
+        msg = QMessageBox(self)
+        msg.setIcon(QMessageBox.Information)
+        msg.setWindowTitle("Warning")
+        msg.setText(languages.text["en"]["restart"])
+        msg.setIconPixmap(QPixmap("images/warning.png").scaled(48,48))
+
+        if self.parent().is_light_mode:
+            TEXT_COLOR = TEXT_COLOR_LIGHT
+            msg.setStyleSheet(f"""
+            QLabel {{ font-family: '{FONT}'; font-size: 24px; color: rgb{TEXT_COLOR}; }}
+            {BUTTON_STYLE_LIGHT} 
+        """)
+        else:
+            TEXT_COLOR = TEXT_COLOR_DARK
+            msg.setStyleSheet(f"""
+            QLabel {{ font-family: '{FONT}'; font-size: 24px; color: rgb{TEXT_COLOR}; }}
+            {BUTTON_STYLE_DARK}
+        """)
+    
+        msg.exec_()
 
     def full_screen_mode(self):
         self.parent().showFullScreen()
         self.set_full_screen.hide()
         self.set_window_mode.show()
         self.is_full_screen = True
+        self.parent().is_full_screen = True
 
     def window_screen_mode(self):
         self.parent().showNormal()
         self.set_window_mode.hide()
         self.set_full_screen.show()
         self.is_full_screen = False
+        self.parent().is_full_screen = False
 
     def change_default_theme(self):
         if self.is_light_mode:
             self.is_light_mode = False 
             self.default_theme.setText(languages.button[self.language]["mode_light"])
-            print(self.is_light_mode)
         else:
             self.is_light_mode = True
             self.default_theme.setText(languages.button[self.language]["mode_dark"])
-            print(self.is_light_mode)
 
     def save_settings(self):
         config_data = {
