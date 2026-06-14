@@ -7,6 +7,8 @@ The technique uses a timer to break down work into intervals, usually **25 minut
 Tutorial:
 Execute the **main.py** file *(make sure you have the proper modules installed)*, then click on the "?" icon for further **usage instructions**. You can change the language in configurations.
 
+
+
 ES:
   La *técnica pomodoro* es un método de gestión del tiempo desarrollado por Francesco Cirillo a finales de la década de 1980.  
 Esta técnica utiliza un temporizador para dividir el trabajo en intervalos, normalmente de **25 minutos de duración**, separados por **descansos cortos**.
