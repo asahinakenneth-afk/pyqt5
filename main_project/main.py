@@ -134,7 +134,7 @@ class MainWindow(QWidget):
         self.down_button_Layout = QHBoxLayout()
 
         self.up_button_Layout.addWidget(self.config_button, alignment=Qt.AlignLeft)
-        self.up_button_Layout.addWidget(self.counter, alignment=Qt.AlignRight)
+        self.up_button_Layout.addWidget(self.counter, alignment=Qt.AlignLeft)
         self.up_button_Layout.addWidget(self.about_button, alignment=Qt.AlignRight)
 
         self.down_button_Layout.addWidget(self.start_button)
@@ -199,6 +199,8 @@ class MainWindow(QWidget):
         else:   
             self.set_dark_mode()
 
+        self.counter_text = languages.text[self.language]["counter"].format(self.usage_count)
+        self.counter.setText(self.counter_text)
         self.label.setText(self.rest_text)
         self.stop_button.hide()
         self.counter.show()

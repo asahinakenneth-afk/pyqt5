@@ -51,7 +51,7 @@ class AboutWindow(QDialog):
         self.about_creator = QPushButton(self.about_creator_btn)
         if self.parent():
             self.about_creator.setStyleSheet(self.parent().start_button.styleSheet())
-        self.about_creator.clicked.connect(lambda: webbrowser.open("https://github.com/asahinakenneth-afk/pyqt5"))
+        self.about_creator.clicked.connect(lambda: webbrowser.open("https://github.com/asahinakenneth-afk"))
 
         self.tutorial = QLabel(self.tutorial_text)
 
