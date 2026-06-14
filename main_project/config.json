@@ -1,8 +1,10 @@
 {
-    "language": "es",
-    "default_timer": "06:00",
+    "language": "en",
+    "default_timer": "25:00",
     "default_time": {
-        "minutes": 6,
+        "minutes": 25,
         "seconds": 0
-    }
+    },
+    "light_mode": false,
+    "full_screen": false
 }

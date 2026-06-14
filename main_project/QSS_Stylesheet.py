@@ -2,11 +2,20 @@ from pyautogui import size
 
 WIDTH, HEIGHT = size()
 
+if WIDTH >= 1920 and HEIGHT >= 1080:
+    COUNTER_HEIGHT = 512
+    WIDTH, HEIGHT = int(WIDTH*0.8), int(HEIGHT*0.8)
+
+else:
+    COUNTER_HEIGHT = 384
+    WIDTH, HEIGHT = int(WIDTH*0.8), int(HEIGHT*0.8)
+
 WINDOW_LIGHT = (255, 189, 203)
 WINDOW_DARK = (54, 11, 27)
 TEMPORIZER_LIGHT = (255, 157, 143)
 TEMPORIZER_DARK = (41, 5, 6)
-TEXT_COLOR = (255, 255, 255)
+TEXT_COLOR_LIGHT = (36, 10, 16)
+TEXT_COLOR_DARK = (209, 148, 165)
 
 
 REST_LIGHT = (157, 205, 237)
@@ -26,20 +35,22 @@ BUTTON_REST_HOVER_DARK = (0, 11, 20)
 FONT = "rainyhearts"
 FONT_JP = "PixelMplus10-Regular"
 
-SET_LABEL_STYLE = f"""color: rgb{TEXT_COLOR}; font-size: 64px; font-family: {FONT};"""
-SET_LABEL_STYLE_JP = f"""color: rgb{TEXT_COLOR}; font-size: 64 px; font-family:{FONT_JP}"""
+SET_LABEL_STYLE_LIGHT = f"""color: rgb{TEXT_COLOR_LIGHT}; font-size: 64px; font-family: {FONT};"""
+SET_LABEL_STYLE_DARK = f"""color: rgb{TEXT_COLOR_DARK}; font-size: 64px; font-family: {FONT};"""
+SET_LABEL_STYLE_JP = f"""color: rgb{TEXT_COLOR_LIGHT}; font-size: 64 px; font-family:{FONT_JP}"""
 
-SET_COUNTER_STYLE = f"""color: rgb{TEXT_COLOR}; font-size: 24px; font-family: {FONT};"""
-SET_COUNTER_STYLE_JP = f"""color: rgb{TEXT_COLOR}; font-size: 24 px; font-family:{FONT_JP}"""
+SET_COUNTER_STYLE_LIGHT = f"""color: rgb{TEXT_COLOR_LIGHT}; font-size: 24px; font-family: {FONT};"""
+SET_COUNTER_STYLE_DARK = f"""color: rgb{TEXT_COLOR_DARK}; font-size: 24px; font-family: {FONT};"""
+SET_COUNTER_STYLE_JP = f"""color: rgb{TEXT_COLOR_LIGHT}; font-size: 24 px; font-family:{FONT_JP}"""
 
-
-SET_TIMER_STYLE = f"""color: rgb{TEXT_COLOR}; font-size: 512px; font-family: {FONT};"""
-SET_TIMER_STYLE_JP = f"""color: rgb{TEXT_COLOR}; font-size: 512 px; font-family:{FONT_JP}"""
+SET_TIMER_STYLE_LIGHT = f"""color: rgb{TEXT_COLOR_LIGHT}; font-size: {COUNTER_HEIGHT}px; font-family: {FONT};"""
+SET_TIMER_STYLE_DARK = f"""color: rgb{TEXT_COLOR_DARK}; font-size: {COUNTER_HEIGHT}px; font-family: {FONT};"""
+SET_TIMER_STYLE_JP = f"""color: rgb{TEXT_COLOR_LIGHT}; font-size: {COUNTER_HEIGHT}px; font-family:{FONT_JP}"""
 
 BUTTON_STYLE_LIGHT = f"""
     QPushButton {{
         background-color: rgb{BUTTON_LIGHT};
-        color: #FFFFFF;
+        color: rgb{TEXT_COLOR_LIGHT};
         font-family: '{FONT}';
         font-size: 32px;
         font-weight: bold;
@@ -64,7 +75,7 @@ BUTTON_STYLE_LIGHT = f"""
 BUTTON_STYLE_DARK = f"""
     QPushButton {{
         background-color: rgb{BUTTON_DARK};
-        color: #FFFFFF;
+        color:  rgb{TEXT_COLOR_DARK};
         font-family: '{FONT}';
         font-size: 32px;
         font-weight: bold;
@@ -89,7 +100,7 @@ BUTTON_STYLE_DARK = f"""
 BUTTON_REST_STYLE_LIGHT = f"""
     QPushButton {{
         background-color: rgb{BUTTON_REST_LIGHT};
-        color: #FFFFFF;
+        color: rgb{TEXT_COLOR_LIGHT};
         font-family: '{FONT}';
         font-size: 32px;
         font-weight: bold;
@@ -114,7 +125,7 @@ BUTTON_REST_STYLE_LIGHT = f"""
 BUTTON_REST_STYLE_DARK = f"""
     QPushButton {{
         background-color: rgb{BUTTON_REST_DARK};
-        color: #FFFFFF;
+        color: rgb{TEXT_COLOR_DARK};
         font-family: '{FONT}';
         font-size: 32px;
         font-weight: bold;

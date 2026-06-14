@@ -32,6 +32,11 @@ class AboutWindow(QDialog):
     def about_screen(self):
         self.welcome = QLabel(self.welcome_text)
 
+        if self.parent().is_light_mode:
+            TEXT_COLOR = TEXT_COLOR_LIGHT
+        else:
+            TEXT_COLOR = TEXT_COLOR_DARK
+
         self.welcome.setStyleSheet(f"color: rgb{TEXT_COLOR}; font-size: 36px; font-family: {FONT};")
 
         self.about = QLabel(self.about_info_text)
@@ -52,7 +57,7 @@ class AboutWindow(QDialog):
 
         self.tutorial.setStyleSheet(f"color: rgb{TEXT_COLOR}; font-size: 26px; font-family: {FONT};")
 
-        self.version = QLabel("Version 1.2")
+        self.version = QLabel("Version 1.4")
         self.version.setStyleSheet(f"color: rgb{TEXT_COLOR}; font-size: 22px; font-family: {FONT};")
 
         self.main_layout = QVBoxLayout()
@@ -84,6 +89,8 @@ class ConfigWindow(QDialog):
             self.setStyleSheet(parent.styleSheet())
             self.language = self.parent().language
             self.is_spanish = (self.parent().language == "es")
+            self.is_light_mode = self.parent().is_light_mode
+            self.is_full_screen = self.parent().is_full_screen
 
         self.current_time = self.parent().default_time
 
@@ -97,6 +104,7 @@ class ConfigWindow(QDialog):
     def set_language(self):
         self.title = languages.text[self.language]["config"]
         self.welcome_text = languages.text[self.language]["config_welcome"]
+        self.change_default_theme_text = languages.text[self.language]["change_theme"]
         self.timers_config_text = languages.text[self.language]["timers_config"]
 
         self.config_timer_btn = languages.button[self.language]["config_time"] 
@@ -104,12 +112,23 @@ class ConfigWindow(QDialog):
         self.window_mode_btn = languages.button[self.language]["window_screen"]   
         self.return_btn = languages.button[self.language]["return"]   
         self.save_btn = languages.button[self.language]["save"]
+        if self.is_light_mode: 
+            self.default_mode_btn = languages.button[self.language]["mode_dark"]
+        else:
+            self.default_mode_btn = languages.button[self.language]["mode_light"]
 
     def config_screen(self):
         self.full_screen = False
 
         self.welcome = QLabel(self.welcome_text)
+        self.default_theme_label = QLabel(self.change_default_theme_text)
+        if self.parent().is_light_mode:
+            TEXT_COLOR = TEXT_COLOR_LIGHT
+        else:
+            TEXT_COLOR = TEXT_COLOR_DARK
+
         self.welcome.setStyleSheet(f"color: rgb{TEXT_COLOR}; font-size: 30px; font-family: {FONT};")
+        self.default_theme_label.setStyleSheet(f"color: rgb{TEXT_COLOR}; font-size: 24px; font-family: {FONT};")
 
         self.current_time_label = QLabel(self.parent().default_time.toString("mm:ss"), self)
         self.current_time_label.setStyleSheet(f"color: rgb{TEXT_COLOR}; font-size: 30px; font-family: {FONT};")
@@ -119,6 +138,7 @@ class ConfigWindow(QDialog):
         self.english_mode = QPushButton("English")
         self.set_full_screen = QPushButton(self.full_screen_btn)
         self.set_window_mode = QPushButton(self.window_mode_btn)
+        self.default_theme = QPushButton(self.default_mode_btn)
         self.return_button = QPushButton(self.return_btn)
         self.save_button = QPushButton(self.save_btn)
 
@@ -132,6 +152,7 @@ class ConfigWindow(QDialog):
         self.english_mode.setFixedSize(300, 75)
         self.set_window_mode.setFixedSize(300, 75)
         self.set_full_screen.setFixedSize(300, 75)
+        self.default_theme.setFixedSize(300, 75)
         self.return_button.setFixedSize(300, 75)
         self.save_button.setFixedSize(300, 75)
 
@@ -146,6 +167,7 @@ class ConfigWindow(QDialog):
             self.english_mode.setStyleSheet(self.parent().start_button.styleSheet())
             self.set_window_mode.setStyleSheet(self.parent().start_button.styleSheet())
             self.set_full_screen.setStyleSheet(self.parent().start_button.styleSheet())
+            self.default_theme.setStyleSheet(self.parent().start_button.styleSheet())
             self.return_button.setStyleSheet(self.parent().start_button.styleSheet())
             self.save_button.setStyleSheet(self.parent().start_button.styleSheet())
 
@@ -173,10 +195,16 @@ class ConfigWindow(QDialog):
         self.main_layout.addWidget(self.english_mode, alignment=Qt.AlignCenter)
         self.main_layout.addWidget(self.set_window_mode, alignment=Qt.AlignCenter)
         self.main_layout.addWidget(self.set_full_screen, alignment=Qt.AlignCenter)
+        self.main_layout.addWidget(self.default_theme_label, alignment=Qt.AlignCenter)
+        self.main_layout.addWidget(self.default_theme, alignment=Qt.AlignCenter)
         self.main_layout.addWidget(self.save_button, alignment=Qt.AlignCenter)
 
         self.container.hide()
-        self.set_window_mode.hide()
+
+        if self.is_full_screen:
+            self.set_full_screen.hide()
+        else:
+            self.set_window_mode.hide()
 
         if self.is_spanish:
             self.spanish_mode.hide()
@@ -184,6 +212,7 @@ class ConfigWindow(QDialog):
         else:    
             self.english_mode.hide()
             self.spanish_mode.show()
+
         self.return_button.hide()
 
         self.setLayout(self.main_layout)
@@ -196,6 +225,7 @@ class ConfigWindow(QDialog):
         self.spanish_mode.hide()
         self.set_window_mode.hide()
         self.set_full_screen.hide()
+        self.default_theme.hide()
         self.spanish_mode.hide()
 
         self.container.show()
@@ -221,7 +251,7 @@ class ConfigWindow(QDialog):
         self.return_button.hide()
         self.container.hide()
 
-        if self.full_screen:
+        if self.is_full_screen:
             self.set_window_mode.show()
 
         else:
@@ -232,6 +262,8 @@ class ConfigWindow(QDialog):
 
         else: 
             self.spanish_mode.show()
+
+        self.default_theme.show()
         self.config_timers.show()
 
     def set_spanish(self):
@@ -254,13 +286,23 @@ class ConfigWindow(QDialog):
         self.parent().showFullScreen()
         self.set_full_screen.hide()
         self.set_window_mode.show()
-        self.full_screen = True
+        self.is_full_screen = True
 
     def window_screen_mode(self):
         self.parent().showNormal()
         self.set_window_mode.hide()
         self.set_full_screen.show()
-        self.full_screen = False
+        self.is_full_screen = False
+
+    def change_default_theme(self):
+        if self.is_light_mode:
+            self.is_light_mode = False 
+            self.default_theme.setText(languages.button[self.language]["mode_light"])
+            print(self.is_light_mode)
+        else:
+            self.is_light_mode = True
+            self.default_theme.setText(languages.button[self.language]["mode_dark"])
+            print(self.is_light_mode)
 
     def save_settings(self):
         config_data = {
@@ -269,8 +311,12 @@ class ConfigWindow(QDialog):
 
         "default_time": {
             "minutes": self.current_time.minute(),
-            "seconds": self.current_time.second()
-            }
+            "seconds": self.current_time.second(),
+            },
+
+        "light_mode" : self.is_light_mode,
+
+        "full_screen" : self.is_full_screen,
         }
         
         try:
@@ -281,6 +327,7 @@ class ConfigWindow(QDialog):
                 print(f"Error al guardar la configuración: {e}")
         self.accept()
 
+    
     def event_handler(self):
         self.save_button.clicked.connect(self.save_settings)
         self.config_timers.clicked.connect(self.config_timers_screen)
@@ -293,4 +340,5 @@ class ConfigWindow(QDialog):
         self.add_5_min.clicked.connect(lambda: self.modify_time(5))
         self.subs_1_min.clicked.connect(lambda: self.modify_time(-1))
         self.subs_5_min.clicked.connect(lambda: self.modify_time(-5))
+        self.default_theme.clicked.connect(self.change_default_theme)
 

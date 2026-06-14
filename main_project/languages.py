@@ -33,17 +33,23 @@ I hope it helps you to concentrate and manage your time better.""",
         "config" : "config",
         "config_welcome" : "Configuration screen",
         "timers_config" : "Timer configuration",
+        "change_theme" : "Change default theme",
 
     ## EXTRA
     "restart" : """
                 Language Change
 Please restart the application to apply the language.""",
+    "chamba_noti" : "Time to work! 💼",
+    "chamba_message" : "It's time to study or work! 💖",
+    "rest_noti" : "Take a rest 🍮",
+    "rest_message" : "Take a rest, drink a coffee and relax ✨"
+
     },
 
     "es": {
         ##MAINWINDOW
         "title" : "Temporizador Pomodoro 🍅",
-        "start_welcome" : "¡Bienvenido a {}!",
+        "start_welcome" : "¡Bienvenid@ al {}!",
         "temp_start": "Temporizador iniciado",
         "temp_stop" : "Temporizador detenido",
 
@@ -52,7 +58,7 @@ Please restart the application to apply the language.""",
 
         ##ABOUTWINDOW
         "about" : "acerca de",
-        "about_welcome" : "Bienvenido a la pantalla 'acerca de' de {}",
+        "about_welcome" : "Bienvenid@ a la pantalla 'acerca de' de {}",
         "about_info" : """
 La técnica pomodoro es un método de gestión del tiempo desarrollado por Francesco Cirillo 
 a finales de la década de 1980. La técnica utiliza un temporizador para dividir el trabajo en intervalos, 
@@ -74,11 +80,16 @@ Espero que te ayude a concentrarte y a gestionar mejor tu tiempo.""",
         "config" : "config",
         "config_welcome" : "Pantalla de configuración",
         "timers_config" : "Configuración de temporizador",
+        "change_theme" : "Cambiar tema por defecto",
 
         ## RESTART
         "restart" : """
                 Cambio de idioma
-Por favor, reinicie la aplicación para aplicar el idioma."""
+Por favor, reinicie la aplicación para aplicar el idioma.""",
+        "chamba_noti" : "¡Manos a la obra! 💼",
+        "chamba_message" : "¡Es hora de trabajar o estudiar! 💖",
+        "rest_noti" : "Tómate un descanso 🍮",
+        "rest_message" : "Es hora de descansar, toma un café y relájate ✨",
     },
 }
 

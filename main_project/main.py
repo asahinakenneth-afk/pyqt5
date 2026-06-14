@@ -1,22 +1,27 @@
 import sys
 import ctypes
+from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QSystemTrayIcon
+from PyQt5.QtCore import Qt, QTimer, QTime
+from PyQt5.QtGui import QFontDatabase, QIcon
+from PyQt5.QtMultimedia import QSound
 import json
 import languages
-from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QLabel, QVBoxLayout, QHBoxLayout
-from PyQt5.QtGui import QFontDatabase, QIcon
-from PyQt5.QtCore import Qt, QTimer, QTime
 from QSS_Stylesheet import *
 from popups import *
 from time import sleep
 
+## Gracias Gemini por resolverme la duda (sólo quería íconos bonitos...)
+myappid = 'AsahinaKenneth.PomodoroTemporizer.1.4' 
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
 def run():
     app = QApplication([])
+    app.setApplicationName("Pomodoro")
+    app.setOrganizationName("Asahina-Kenneth") 
+    app.setApplicationVersion("1.4")
     window = MainWindow()
     app.exec_()
 
-## Gracias Gemini por resolverme la duda (sólo quería íconos bonitos...)
-myappid = 'pomodoro.1.0' 
-ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 class MainWindow(QWidget):
     def __init__(self, parent=None, flags=Qt.WindowFlags()):
@@ -25,10 +30,16 @@ class MainWindow(QWidget):
         QFontDatabase.addApplicationFont("fonts/rainyhearts.ttf")
         QFontDatabase.addApplicationFont("fonts/PixelMplus10-Regular.ttf")
         
+        self.rest_sound = QSound("sfx/rest.wav")
+        self.chamba_sound = QSound("sfx/chamba.wav")
+        self.notifier = QSystemTrayIcon(self)
+
         self.language = "en"
         self.default_timer = "25:00"
         self.default_time = QTime(0, 25, 0)
         self.usage_count = 0
+        self.is_light_mode = True 
+        self.is_full_screen = False
  
         self.config = "config.json"
         ## Okay juro que lo único que pedí a la IA fue lo de abrir el archivo json, el try/error es mío
@@ -40,6 +51,8 @@ class MainWindow(QWidget):
                 self.default_timer = data["default_timer"]
                 time_data = data.get("default_time", {"minutes": 25, "seconds": 0})
                 self.default_time = QTime(0, time_data["minutes"], time_data["seconds"])
+                self.is_dark_mode = data["light_mode"]
+                self.is_full_screen = data["full_screen"]
         except FileNotFoundError:
             pass
 
@@ -47,14 +60,26 @@ class MainWindow(QWidget):
         self.config_window()
         self.set_mainscreen()
         self.event_handler()
-        self.set_light_mode()
-        self.show()
+        self.notifier.show()
+        
+        if self.is_light_mode:
+            self.set_light_mode()
+        else: 
+            self.set_dark_mode()
+
+        if self.is_full_screen:
+            self.showFullScreen()
+        else: 
+            self.show()
 
     def config_window(self):
+        main_icon = QIcon("images/logo.ico")
+        self.notifier.setToolTip("Pomodoro")
         self.setWindowTitle(self.title)
         self.setGeometry(0, 0, WIDTH, HEIGHT)
         self.setStyleSheet(f"background-color: rgb{WINDOW_LIGHT};")
-        self.setWindowIcon(QIcon("images/logo.png"))
+        self.setWindowIcon(main_icon)
+        self.notifier.setIcon(main_icon)
 
     def set_language(self):
         self.title = languages.text[self.language]["title"]
@@ -83,9 +108,9 @@ class MainWindow(QWidget):
         self.counter = QLabel(self.counter_text)
         self.timer = QLabel(self.default_timer, self)
 
-        self.label.setStyleSheet(SET_LABEL_STYLE)
-        self.counter.setStyleSheet(SET_COUNTER_STYLE)
-        self.timer.setStyleSheet(SET_TIMER_STYLE)
+        self.label.setStyleSheet(SET_LABEL_STYLE_LIGHT)
+        self.counter.setStyleSheet(SET_COUNTER_STYLE_LIGHT)
+        self.timer.setStyleSheet(SET_TIMER_STYLE_LIGHT)
 
         self.config_button = QPushButton("⚙️")
         self.about_button = QPushButton("❓")
@@ -162,10 +187,12 @@ class MainWindow(QWidget):
         self.stop_button.show()
         self.return_button.show()
 
+        self.notify()
+
     def rest_screen(self):
         self.wait_time(0.5)
         self.is_rest_screen = True
-        self.usage_count += 1
+        self.counter_text = languages.text[self.language]["counter"].format(self.usage_count)
         self.counter.setText(self.counter_text)
         if self.is_light_mode:
             self.set_light_mode()
@@ -173,13 +200,14 @@ class MainWindow(QWidget):
             self.set_dark_mode()
 
         self.label.setText(self.rest_text)
-        self.timer.setText("05:00")
         self.stop_button.hide()
         self.counter.show()
         self.re_start_button.hide()
 
         self.rest_temporizer()
         self.update_timer()
+
+        self.notify()
 
     def return_main_screen(self):
         self.wait_time(0.5)
@@ -213,6 +241,7 @@ class MainWindow(QWidget):
             self.timer_engine.stop()
 
             if not self.is_rest_screen:
+                self.usage_count += 1 
                 self.rest_screen()
             else:
                 self.start_temporizer()
@@ -239,8 +268,10 @@ class MainWindow(QWidget):
         
     def rest_temporizer(self):
         if self.usage_count % 4 == 0 and self.usage_count != 0: ## Cada 4 pomodoros, un descanso largo
+            self.timer.setText("15:00")
             self.time_left = QTime(0, 0, 15) ## 15 minutitos de descanso largo
         else:
+            self.timer.setText("05:00")
             self.time_left = QTime(0, 0, 5) ## 5 minutitos de descanso
         self.timer_engine.start(2000)
 
@@ -269,6 +300,9 @@ class MainWindow(QWidget):
             self.re_start_button.setStyleSheet(BUTTON_STYLE_LIGHT)
             self.mode_button.setStyleSheet(BUTTON_STYLE_LIGHT)
             self.return_button.setStyleSheet(BUTTON_STYLE_LIGHT)
+        self.label.setStyleSheet(SET_LABEL_STYLE_LIGHT)
+        self.counter.setStyleSheet(SET_COUNTER_STYLE_LIGHT)
+        self.timer.setStyleSheet(SET_TIMER_STYLE_LIGHT)
         self.is_light_mode = True
 
         if hasattr(self, 'about_window') and self.about_window.isVisible():
@@ -278,6 +312,10 @@ class MainWindow(QWidget):
             else:
                 self.about_window.setStyleSheet(f"background-color: rgb{WINDOW_LIGHT};")
                 self.about_window.about_creator.setStyleSheet(BUTTON_STYLE_LIGHT)
+            self.about_window.welcome.setStyleSheet(f"color: rgb{TEXT_COLOR_LIGHT}; font-size: 36px; font-family: {FONT};")
+            self.about_window.about.setStyleSheet(f"color: rgb{TEXT_COLOR_LIGHT}; font-size: 30px; font-family: {FONT};")
+            self.about_window.tutorial.setStyleSheet(f"color: rgb{TEXT_COLOR_LIGHT}; font-size: 26px; font-family: {FONT};")
+            self.about_window.version.setStyleSheet(f"color: rgb{TEXT_COLOR_LIGHT}; font-size: 22px; font-family: {FONT};")
 
     def set_dark_mode(self):
         self.wait_time(0.2)
@@ -301,6 +339,10 @@ class MainWindow(QWidget):
             self.re_start_button.setStyleSheet(BUTTON_STYLE_DARK)
             self.mode_button.setStyleSheet(BUTTON_STYLE_DARK)
             self.return_button.setStyleSheet(BUTTON_STYLE_DARK)
+
+        self.label.setStyleSheet(SET_LABEL_STYLE_DARK)
+        self.counter.setStyleSheet(SET_COUNTER_STYLE_DARK)
+        self.timer.setStyleSheet(SET_TIMER_STYLE_DARK)
         self.is_light_mode = False
 
         if hasattr(self, 'about_window') and self.about_window.isVisible():
@@ -310,6 +352,10 @@ class MainWindow(QWidget):
             else:
                 self.about_window.setStyleSheet(f"background-color: rgb{WINDOW_DARK};")
                 self.about_window.about_creator.setStyleSheet(BUTTON_STYLE_DARK)
+            self.about_window.welcome.setStyleSheet(f"color: rgb{TEXT_COLOR_DARK}; font-size: 36px; font-family: {FONT};")
+            self.about_window.about.setStyleSheet(f"color: rgb{TEXT_COLOR_DARK}; font-size: 30px; font-family: {FONT};")
+            self.about_window.tutorial.setStyleSheet(f"color: rgb{TEXT_COLOR_DARK}; font-size: 26px; font-family: {FONT};")
+            self.about_window.version.setStyleSheet(f"color: rgb{TEXT_COLOR_DARK}; font-size: 22px; font-family: {FONT};")
 
     def alternate_mode(self):
         if self.is_light_mode:
@@ -322,6 +368,25 @@ class MainWindow(QWidget):
     def wait_time(self, seconds):
         global sleep
         sleep(seconds)
+
+    def notify(self):
+        if self.is_rest_screen:
+            self.rest_sound.play()
+    
+            self.notifier.showMessage(
+                languages.text[self.language]["rest_noti"],
+languages.text[self.language]["rest_message"],
+    self.notifier.icon(), # esto sirve para que el puto windows no muestre su icono todo pedorro feo
+    25*60)
+        else: 
+            self.chamba_sound.play()
+            
+            self.notifier.showMessage(
+            languages.text[self.language]["chamba_noti"],
+languages.text[self.language]["chamba_message"],
+    self.notifier.icon(), # esto sirve para que el puto windows no muestre su icono todo pedorro feo
+    25*60
+)
 
     def event_handler(self):
         self.timer_engine.timeout.connect(self.update_timer) ## La conecta a la funcion que actualiza el tiempo
